@@ -1,0 +1,6 @@
+# This file states files and folder which will be ignored by git.
+
+# node modules folder
+node_modules/
+# production folder
+dist/
