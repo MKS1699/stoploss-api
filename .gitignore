@@ -2,5 +2,9 @@
 
 # node modules folder
 node_modules/
+
 # production folder
 dist/
+
+#env files
+.env
