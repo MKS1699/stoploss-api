@@ -14,13 +14,11 @@ const postSchema: mongoose.Schema = new mongoose.Schema({
     required: true,
   },
   postCreated: {
-    type: Date,
+    type: String,
     required: true,
-    default: Date.now(),
   },
   postUpdated: {
-    type: Date,
-    default: Date.now(),
+    type: String,
   },
   hasImage: {
     type: Boolean,

@@ -9,8 +9,8 @@ export interface POST {
     | "blog"
     | "sponsored_post"
     | "company_profile";
-  postCreated?: Date | string;
-  postUpdated?: Date | string;
+  postCreated: string;
+  postUpdated: string;
   postImage: IMAGE;
   hasImage: boolean;
   postParagraphs: PARAGRAPH[];
@@ -20,13 +20,16 @@ export interface POST {
     upcomingIPO: boolean;
     ipoName: string;
   };
-  createdBy: string;
+  createdBy: {
+    name: string;
+    id: string;
+  };
 }
 
 // Paragraph Types of the post
 export interface PARAGRAPH {
-  paraHeading?: string;
-  paraSubHeading?: string;
+  paraHeading: string;
+  paraSubHeading: string;
   paraBody: string;
   hasImages: boolean;
   paraImages: IMAGE[];
@@ -38,8 +41,8 @@ export interface PARAGRAPH {
 export interface IMAGE {
   links: {
     original: string;
-    medium?: string;
-    thumbnail?: string;
+    medium: string;
+    thumbnail: string;
   };
   caption: string;
 }
