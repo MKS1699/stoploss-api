@@ -8,3 +8,7 @@ dist/
 
 #env files
 .env
+
+#miscellanous 
+todo.txt
+
