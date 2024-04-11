@@ -1,4 +1,5 @@
 import PostModel from "./postSchema";
 import UserModel from "./userSchema";
 import TagModel from "./tagSchema";
-export { PostModel, UserModel, TagModel };
+import UpcomingIPOModel from "./upcomingIPOSchema";
+export { PostModel, UserModel, TagModel, UpcomingIPOModel };

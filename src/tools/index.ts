@@ -11,6 +11,7 @@ export const stringHash = async (data: string): Promise<string> => {
   return hashedStr;
 };
 
+// token creating
 export const createToken = async (payload: string): Promise<string> => {
   const key = process.env.JWT_KEY;
   const token = jwt.sign({ payload }, key, {
@@ -19,3 +20,17 @@ export const createToken = async (payload: string): Promise<string> => {
 
   return token;
 };
+
+// duplicate value find in array
+export async function checkForDuplicate(
+  value: any,
+  arr: any[]
+): Promise<boolean> {
+  let result = false;
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i] === value) {
+      result = true;
+    }
+  }
+  return result;
+}
