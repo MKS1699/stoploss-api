@@ -49,3 +49,11 @@ export interface IMAGE {
 
 // Table Types for the post
 export type TABLE = string[][];
+
+// Upcoming IPO List Types
+export interface UPCOMINGIPOLISTTYPES {
+  ipoName: string;
+  open: string;
+  close: string;
+  linkedPostsId: string[];
+}
