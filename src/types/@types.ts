@@ -18,12 +18,12 @@ export interface POST {
   postDescription: string;
   postInfo: {
     upcomingIPO: boolean;
-    ipoName: string;
   };
   createdBy: {
     name: string;
     id: string;
   };
+  postExternalLinks: string[];
 }
 
 // Paragraph Types of the post

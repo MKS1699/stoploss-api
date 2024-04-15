@@ -8,7 +8,6 @@ import {
   getAllIPOEntries,
   getIPOEntryById,
   getIPOEntryByName,
-  postImageUpload,
   removeOneLinkedPost,
   updateUpcomingIPOClose,
   updateUpcomingIPOName,
@@ -17,8 +16,6 @@ import {
 import express from "express";
 
 const postRouter: express.Router = express.Router();
-
-postRouter.post("/imageUpload", postImageUpload);
 
 // posts related routes
 postRouter.post("/createPost", verifyToken, createNewPost);

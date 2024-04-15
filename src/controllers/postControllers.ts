@@ -15,16 +15,6 @@ import {
   updateUpcomingIPOEntryIPOName,
   updateUpcomingIPOEntryOpen,
 } from "../db/models/upcomingIPOModels";
-export async function postImageUpload(
-  req: express.Request,
-  res: express.Response
-) {
-  //   const { image } = req.body;
-  //   console.log(req);
-  //   const a: express.Request = req;
-  //   const file = req.file
-  //   res.status(200).json({ message: "Image Upload", re });
-}
 
 export async function createNewPost(
   req: express.Request,
@@ -33,21 +23,47 @@ export async function createNewPost(
   try {
     const post: POST = req.body.post;
     const tags: [string] = req.body.post.postTags;
+    const upcomingIPOEntry: UPCOMINGIPOLISTTYPES = req.body.post.postInfo;
+    // storing post in db
     const RESULT = await createPost(post);
     const postID = RESULT.newPost?._id;
+    // storing tags linked to current post in db
     for (let tag of tags) {
-      const foundTag = await findTag(tag);
-      const foundTagID: string = foundTag.foundTag?._id.toString();
-      // const foundTagPosts : [string] = foundTag.foundTag?.posts;
-      if (foundTag.foundTag === null) {
-        // new tag creation for the post
-        const newTAG = await createTag({
-          tag,
-          id: postID,
+      const TAG_EXIST = await findTag(tag);
+      if (TAG_EXIST.foundTag === null) {
+        const newTAG = await createTag({ tag, id: postID });
+      } else if (TAG_EXIST.foundTag !== null) {
+        const posts = TAG_EXIST.foundTag.posts;
+        const postLinked = posts.filter((post: string) => post === postID);
+        if (postLinked.length === 0) {
+          const updatedTAG = await updateTagByPostID({
+            postID,
+            tagID: TAG_EXIST.foundTag._id,
+          });
+        }
+      }
+    }
+    // storing upcmoingIPO entry and post linking
+    if (post.postInfo.upcomingIPO) {
+      const { ipoName, open, close, linkedPostsId }: UPCOMINGIPOLISTTYPES =
+        upcomingIPOEntry;
+      const searchEntry = await findUpcomingIPOEntryByIPOName(ipoName);
+      // update existing entry
+      if (searchEntry.foundEntry !== null) {
+        const foundEntryId = searchEntry.foundEntry._id;
+        const updateEntry = await addOneLinkedPostId({
+          id: foundEntryId,
+          linkedPostId: postID,
         });
-      } else {
-        // updating existing tag and linking a new post to it
-        const TAG = await updateTagByPostID({ postID, tagID: foundTagID });
+      }
+      // create new entry
+      else {
+        const newEntry = await createNewUpcomingIPO({
+          ipoName,
+          open,
+          close,
+          linkedPostsId: [postID],
+        });
       }
     }
     res.status(201).json(RESULT);
