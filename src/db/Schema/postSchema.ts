@@ -50,9 +50,6 @@ const postSchema: mongoose.Schema = new mongoose.Schema({
     upComingIPO: {
       type: Boolean,
     },
-    ipoName: {
-      type: String,
-    },
   },
   createdBy: {
     id: {
@@ -104,6 +101,7 @@ const postSchema: mongoose.Schema = new mongoose.Schema({
       paraTable: [[String]],
     },
   ],
+  postExternalLinks: [String],
 });
 
 const PostModel = mongoose.models.Post || mongoose.model("Post", postSchema);

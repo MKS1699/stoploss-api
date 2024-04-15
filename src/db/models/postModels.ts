@@ -16,6 +16,7 @@ export async function createPost(post: POST) {
       postCreated,
       postUpdated,
       createdBy,
+      postExternalLinks,
     } = post;
 
     const newPost = await PostModel.create({
@@ -31,6 +32,7 @@ export async function createPost(post: POST) {
       postCreated,
       postUpdated,
       createdBy,
+      postExternalLinks,
     });
     return {
       message: "Post created.",
