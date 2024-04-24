@@ -65,3 +65,53 @@ export async function updateTagByPostID({
     };
   }
 }
+
+// find tag related to specific post
+export async function findTagsRelatedToPost(postId: string) {
+  try {
+    const tags = await TagModel.find({ posts: postId }).select(["tag"]);
+    if (tags) {
+      return {
+        tags,
+        message: `Tags related to post with id : ${postId}.`,
+        operation: true,
+      };
+    } else {
+      return {
+        tags,
+        message: `Tags do not exist for post with id  :${postId}.`,
+        operation: false,
+      };
+    }
+  } catch (error) {
+    return {
+      message: "Error finding tags related to post.",
+      error,
+    };
+  }
+}
+
+// find posts related to tag
+export async function findPostsRelatedToTags(tag: string) {
+  try {
+    const posts = await TagModel.find({ tag }).select(["posts"]);
+    if (posts.length > 0) {
+      return {
+        posts,
+        message: "Posts related to tags.",
+        operation: true,
+      };
+    } else {
+      return {
+        posts,
+        operation: false,
+        message: "Posts do not exist for tag.",
+      };
+    }
+  } catch (error) {
+    return {
+      error,
+      message: "Error finding posts related to tag.",
+    };
+  }
+}
