@@ -6,8 +6,16 @@ import {
   createNewUpcomingIPOListEntry,
   deleteUpcomingIPOEntry,
   getAllIPOEntries,
+  getAllPostsSize,
   getIPOEntryById,
   getIPOEntryByName,
+  getPostById,
+  getPostSizeByType,
+  getPostsByTypeWithLimit,
+  getPostsByTypeWithLimitOlderElements,
+  getPostsRelatedToTag,
+  getPostsSizeByUser,
+  getTagsRelatedToPost,
   removeOneLinkedPost,
   updateUpcomingIPOClose,
   updateUpcomingIPOName,
@@ -18,6 +26,33 @@ import express from "express";
 const postRouter: express.Router = express.Router();
 
 // posts related routes
+
+// get post
+// by id
+postRouter.post("/get/id", getPostById);
+// by type with limit
+postRouter.post("/get/type", getPostsByTypeWithLimit);
+
+// by type with limit but older than last element
+postRouter.get("/get/type/pagination", getPostsByTypeWithLimitOlderElements);
+
+// posts count
+// by type
+postRouter.post("/count/type", getPostSizeByType);
+
+// all posts
+postRouter.get("/count/all", getAllPostsSize);
+
+// by user
+postRouter.get("/count/user", getPostsSizeByUser);
+
+// tags related to post
+postRouter.post("/tags/", getTagsRelatedToPost);
+
+// posts related to tag
+postRouter.post("/tags/posts", getPostsRelatedToTag);
+
+// create new post
 postRouter.post("/createPost", verifyToken, createNewPost);
 
 // upcoming ipo list related post routes

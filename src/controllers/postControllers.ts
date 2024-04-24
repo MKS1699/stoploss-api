@@ -1,5 +1,19 @@
-import { createTag, findTag, updateTagByPostID } from "../db/models/tagModels";
-import { createPost } from "../db/models/postModels";
+import {
+  createTag,
+  findPostsRelatedToTags,
+  findTag,
+  findTagsRelatedToPost,
+  updateTagByPostID,
+} from "../db/models/tagModels";
+import {
+  countAllPosts,
+  countPostsByType,
+  countPostsByUsers,
+  createPost,
+  findPostById,
+  findPostByTypewithLimit,
+  findPostByTypewithLimitByDateOfLastElem,
+} from "../db/models/postModels";
 import express from "express";
 import { POST, UPCOMINGIPOLISTTYPES } from "types/@types";
 import {
@@ -16,6 +30,163 @@ import {
   updateUpcomingIPOEntryOpen,
 } from "../db/models/upcomingIPOModels";
 
+// post related
+// get post by id
+export async function getPostById(req: express.Request, res: express.Response) {
+  try {
+    const { id }: { id: string } = req.body;
+    if (id) {
+      const result = await findPostById(id);
+      if (result.operation) {
+        res.status(200).json({
+          result,
+        });
+      } else {
+        // 424 : Failed dependency
+        // as in id provided doesn't exist.
+        res.status(424).json({ result });
+      }
+    } else {
+      res.status(401).json({
+        message: "Please provide post id.",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error.",
+      error,
+    });
+  }
+}
+
+// posts by type with limit
+export async function getPostsByTypeWithLimit(
+  req: express.Request,
+  res: express.Response
+) {
+  try {
+    const { postType, limit }: { postType: string; limit: number } = req.body;
+    if (postType) {
+      const result = await findPostByTypewithLimit(postType, limit);
+      if (result.operation) {
+        res.status(200).json({ result });
+      } else {
+        res.status(424).json({ result });
+      }
+    } else {
+      res
+        .status(401)
+        .json({ message: "Please provide type of the posts to get." });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error." });
+  }
+}
+
+// posts by type with limit and older than previous last updated
+export async function getPostsByTypeWithLimitOlderElements(
+  req: express.Request,
+  res: express.Response
+) {
+  try {
+    const {
+      postUpdatedOfLastElement,
+      postType,
+      limit,
+    }: {
+      postType: string;
+      limit: number;
+      postUpdatedOfLastElement: Date;
+    } = req.body;
+    if (postType && postUpdatedOfLastElement) {
+      const result = await findPostByTypewithLimitByDateOfLastElem(
+        postUpdatedOfLastElement,
+        postType,
+        limit
+      );
+      if (result.operation) {
+        res.status(200).json({ result });
+      } else {
+        res.status(424).json({ result });
+      }
+    } else if (!postType) {
+      res
+        .status(401)
+        .json({ message: "Please provide postType of the posts to get." });
+    } else if (!postUpdatedOfLastElement) {
+      res.status(401).json({
+        message:
+          "Please provide postUpdatedOfLastElement date of the last posts to get.",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error." });
+  }
+}
+
+// number of posts
+// by type
+export async function getPostSizeByType(
+  req: express.Request,
+  res: express.Response
+) {
+  try {
+    const { postType }: { postType: POST["postType"] } = req.body;
+    if (postType) {
+      const result = await countPostsByType(postType);
+      if (result.operation) {
+        res.status(200).json({ result });
+      } else {
+        res.status(404).json({ result });
+      }
+    } else {
+      res
+        .status(424)
+        .json({ message: 'Please provide type of posts. "postType"' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error.", error });
+  }
+}
+
+// all posts
+export async function getAllPostsSize(_: null, res: express.Response) {
+  try {
+    const result = await countAllPosts();
+    if (result.operation) {
+      res.status(200).json({ result });
+    } else {
+      res.status(404).json({ result });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error.", error });
+  }
+}
+
+// created by user
+export async function getPostsSizeByUser(
+  req: express.Request,
+  res: express.Response
+) {
+  try {
+    const { userId }: { userId: POST["createdBy"]["id"] } = req.body;
+    if (userId) {
+      const result = await countPostsByUsers(userId);
+      if (result.operation) {
+        res.status(200).json({ result });
+      } else {
+        res.status(404).json({ result });
+      }
+    } else {
+      res
+        .status(401)
+        .json({ message: 'Please provide id of the user "userId".' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error.", error });
+  }
+}
+// create new post with tags, ipo entry creation & linking
 export async function createNewPost(
   req: express.Request,
   res: express.Response
@@ -75,8 +246,52 @@ export async function createNewPost(
   }
 }
 
+/* This section deals with tags for post(s) */
+// get tags related to post
+export async function getTagsRelatedToPost(
+  req: express.Request,
+  res: express.Response
+) {
+  try {
+    const { postId }: { postId: string } = req.body;
+    if (postId) {
+      const result = await findTagsRelatedToPost(postId);
+      if (result.operation) {
+        res.status(200).json({ result });
+      } else {
+        res.status(404).json({ result });
+      }
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+// get posts related to tag
+export async function getPostsRelatedToTag(
+  req: express.Request,
+  res: express.Response
+) {
+  try {
+    const { tag }: { tag: string } = req.body;
+    if (tag) {
+      const result = await findPostsRelatedToTags(tag);
+      if (result.operation) {
+        res.status(200).json({ result });
+      } else {
+        res
+          .status(404)
+          .json({ message: `Posts do not exist for tag : ${tag}.`, result });
+      }
+    } else {
+      res.status(401).json({ message: 'Please provide "tag".' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error." });
+  }
+}
+
 /* This section deals with upcoming IPO List creation */
-// todo
 // get all ipo entries
 export async function getAllIPOEntries(_: null, res: express.Response) {
   try {
