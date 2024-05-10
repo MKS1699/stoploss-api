@@ -36,24 +36,27 @@ export async function createNewUpcomingIPO({
 export async function findAllUpcomingIPOEntries() {
   try {
     const ALL_ENTRIES = await UpcomingIPOModel.find();
-    if (ALL_ENTRIES) {
+    if (ALL_ENTRIES.length > 0) {
       return {
         message: "All entries fetched.",
-        operation: "success",
+        operation: true,
         ALL_ENTRIES,
+        statusCode: 1,
       };
     } else {
       return {
         message: "Create entries first.",
-        operation: "success",
+        operation: true,
         ALL_ENTRIES,
+        statusCode: 0,
       };
     }
   } catch (error) {
     return {
       message: "Unable to get IPO Entries.",
-      operation: "error",
+      operation: false,
       error,
+      statusCode: 0,
     };
   }
 }
@@ -65,21 +68,24 @@ export async function findUpcomingIPOEntryByIPOName(ipoName: string) {
     if (foundEntry !== null) {
       return {
         message: "Found IPO entry.",
-        operation: "success",
+        operation: true,
+        statusCode: 1,
         foundEntry,
       };
     } else if (foundEntry == null) {
       return {
         message: `Entry with ipoName : ${ipoName} doesn't exists.`,
-        operation: "error",
+        operation: true,
         foundEntry,
+        statusCode: 0,
       };
     }
   } catch (error) {
     return {
       error,
       message: "Error while finding entry.",
-      operation: "error",
+      operation: false,
+      statusCode: 0,
     };
   }
 }
@@ -90,21 +96,24 @@ export async function findUpcomingIPOEntryByID(id: string) {
     if (foundEntry) {
       return {
         message: `Entry found with id : ${id}`,
-        operation: "success",
+        operation: true,
         foundEntry,
+        statusCode: 1,
       };
     } else {
       return {
         message: `Entry with id : ${id} doesn't exist.`,
-        operation: "success",
+        operation: true,
         foundEntry,
+        statusCode: 0,
       };
     }
   } catch (error) {
     return {
       error,
       message: "Error finding IPO entry by id.",
-      operation: "error",
+      operation: false,
+      statusCode: 0,
     };
   }
 }

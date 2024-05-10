@@ -70,23 +70,27 @@ export async function updateTagByPostID({
 export async function findTagsRelatedToPost(postId: string) {
   try {
     const tags = await TagModel.find({ posts: postId }).select(["tag"]);
-    if (tags) {
+    if (tags.length > 0) {
       return {
         tags,
         message: `Tags related to post with id : ${postId}.`,
         operation: true,
+        statusCode: 1,
       };
     } else {
       return {
         tags,
         message: `Tags do not exist for post with id  :${postId}.`,
-        operation: false,
+        operation: true,
+        statusCode: 0,
       };
     }
   } catch (error) {
     return {
       message: "Error finding tags related to post.",
       error,
+      operation: false,
+      statusCode: 0,
     };
   }
 }
@@ -98,20 +102,24 @@ export async function findPostsRelatedToTags(tag: string) {
     if (posts.length > 0) {
       return {
         posts,
-        message: "Posts related to tags.",
+        message: `Posts related to tag: "${tag}" .`,
         operation: true,
+        statusCode: 1,
       };
     } else {
       return {
         posts,
-        operation: false,
+        operation: true,
         message: "Posts do not exist for tag.",
+        statusCode: 0,
       };
     }
   } catch (error) {
     return {
       error,
       message: "Error finding posts related to tag.",
+      operation: false,
+      statusCode: 0,
     };
   }
 }
