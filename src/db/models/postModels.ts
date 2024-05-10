@@ -37,14 +37,16 @@ export async function createPost(post: POST) {
     });
     return {
       message: "Post created.",
-      operation: "success",
+      operation: true,
       newPost,
+      statusCode: 1,
     };
   } catch (error) {
     return {
       message: "Unable to create post.",
       error,
-      operation: "fail",
+      operation: false,
+      statusCode: 0,
     };
   }
 }
@@ -59,18 +61,22 @@ export async function findPostById(id: string) {
         post,
         message: "Post found.",
         operation: true,
+        statusCode: 1,
       };
     } else {
       return {
         post,
         message: `Post with id : ${id} doesn't exist.`,
-        operation: false,
+        operation: true,
+        statusCode: 0,
       };
     }
   } catch (error) {
     return {
       error,
       message: "Unable to find post.",
+      operation: false,
+      statusCode: 0,
     };
   }
 }
@@ -88,7 +94,7 @@ export async function findPostById(id: string) {
 //   "postUpdated",
 //   "postDescription",
 // ]
-export async function findPostByTypewithLimit(
+export async function findPostByTypeWithLimit(
   postType: string,
   limit: number = -1
 ) {
@@ -114,12 +120,14 @@ export async function findPostByTypewithLimit(
           posts,
           message: "Posts found.",
           operation: true,
+          statusCode: 1,
         };
       } else {
         return {
           posts,
           message: `Posts of type : ${postType} does not exist.`,
-          operation: false,
+          operation: true,
+          statusCode: 0,
         };
       }
     } else {
@@ -142,12 +150,14 @@ export async function findPostByTypewithLimit(
           posts,
           message: "Posts found.",
           operation: true,
+          statusCode: 1,
         };
       } else {
         return {
           posts,
           message: `Posts of type : ${postType} does not exist.`,
-          operation: false,
+          operation: true,
+          statusCode: 0,
         };
       }
     }
@@ -155,6 +165,8 @@ export async function findPostByTypewithLimit(
     return {
       error,
       message: `Error finding "${postType}" posts.`,
+      operation: false,
+      statusCode: 0,
     };
   }
 }
@@ -173,7 +185,7 @@ export async function findPostByTypewithLimit(
 //   "postDescription",
 // ]
 
-export async function findPostByTypewithLimitByDateOfLastElem(
+export async function findPostByTypeWithLimitByDateOfLastElem(
   postUpdatedOfLastElement: Date,
   postType: string,
   limit: number = -1
@@ -205,12 +217,14 @@ export async function findPostByTypewithLimitByDateOfLastElem(
           posts,
           message: "Posts found.",
           operation: true,
+          statusCode: 1,
         };
       } else {
         return {
           posts,
           message: `Posts of type : ${postType} does not exist.`,
-          operation: false,
+          operation: true,
+          statusCode: 0,
         };
       }
     } else {
@@ -238,12 +252,14 @@ export async function findPostByTypewithLimitByDateOfLastElem(
           posts,
           message: "Posts found.",
           operation: true,
+          statusCode: 1,
         };
       } else {
         return {
           posts,
           message: `Posts of type : ${postType} does not exist.`,
-          operation: false,
+          operation: true,
+          statusCode: 0,
         };
       }
     }
@@ -251,6 +267,8 @@ export async function findPostByTypewithLimitByDateOfLastElem(
     return {
       message: `Error finding ${postType} posts.`,
       error,
+      operation: false,
+      statusCode: 0,
     };
   }
 }
@@ -265,18 +283,22 @@ export async function countPostsByType(postType: POST["postType"]) {
         message: `Posts of type : ${postType} are ${nPosts}.`,
         nPosts,
         operation: true,
+        statusCode: 1,
       };
     } else {
       return {
         message: `Posts of type  : ${postType} do not exists.`,
         nPosts,
-        operation: false,
+        operation: true,
+        statusCode: 0,
       };
     }
   } catch (error) {
     return {
       message: "Error counting posts by type.",
       error,
+      operation: false,
+      statusCode: 0,
     };
   }
 }
@@ -290,18 +312,22 @@ export async function countAllPosts() {
         message: `Number of posts are ${nPosts}.`,
         nPosts,
         operation: true,
+        statusCode: 1,
       };
     } else {
       return {
         message: `Posts do not exists.`,
         nPosts,
-        operation: false,
+        operation: true,
+        statusCode: 0,
       };
     }
   } catch (error) {
     return {
       message: "Error counting all posts.",
       error,
+      operation: false,
+      statusCode: 0,
     };
   }
 }
@@ -315,18 +341,22 @@ export async function countPostsByUsers(userId: POST["createdBy"]["id"]) {
         message: `Posts created by user with id : "${userId}" are "${nPosts}".`,
         nPosts,
         operation: true,
+        statusCode: 1,
       };
     } else {
       return {
         message: `There are no Posts created by user with id "${userId}" .`,
         nPosts,
-        operation: false,
+        operation: true,
+        statusCode: 0,
       };
     }
   } catch (error) {
     return {
       message: "Error counting posts by user.",
       error,
+      operation: false,
+      statusCode: 0,
     };
   }
 }

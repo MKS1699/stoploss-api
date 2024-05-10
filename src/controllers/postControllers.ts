@@ -11,8 +11,8 @@ import {
   countPostsByUsers,
   createPost,
   findPostById,
-  findPostByTypewithLimit,
-  findPostByTypewithLimitByDateOfLastElem,
+  findPostByTypeWithLimit,
+  findPostByTypeWithLimitByDateOfLastElem,
 } from "../db/models/postModels";
 import express from "express";
 import { POST, UPCOMINGIPOLISTTYPES } from "types/@types";
@@ -41,14 +41,10 @@ export async function getPostById(req: express.Request, res: express.Response) {
         res.status(200).json({
           result,
         });
-      } else {
-        // 424 : Failed dependency
-        // as in id provided doesn't exist.
-        res.status(424).json({ result });
       }
     } else {
       res.status(401).json({
-        message: "Please provide post id.",
+        message: "Please provide post id. 'id' ",
       });
     }
   } catch (error) {
@@ -67,16 +63,14 @@ export async function getPostsByTypeWithLimit(
   try {
     const { postType, limit }: { postType: string; limit: number } = req.body;
     if (postType) {
-      const result = await findPostByTypewithLimit(postType, limit);
+      const result = await findPostByTypeWithLimit(postType, limit);
       if (result.operation) {
         res.status(200).json({ result });
-      } else {
-        res.status(424).json({ result });
       }
     } else {
-      res
-        .status(401)
-        .json({ message: "Please provide type of the posts to get." });
+      res.status(401).json({
+        message: "Please provide type of the posts to get. 'postType' ",
+      });
     }
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error." });
@@ -99,24 +93,22 @@ export async function getPostsByTypeWithLimitOlderElements(
       postUpdatedOfLastElement: Date;
     } = req.body;
     if (postType && postUpdatedOfLastElement) {
-      const result = await findPostByTypewithLimitByDateOfLastElem(
+      const result = await findPostByTypeWithLimitByDateOfLastElem(
         postUpdatedOfLastElement,
         postType,
         limit
       );
       if (result.operation) {
         res.status(200).json({ result });
-      } else {
-        res.status(424).json({ result });
       }
     } else if (!postType) {
-      res
-        .status(401)
-        .json({ message: "Please provide postType of the posts to get." });
+      res.status(401).json({
+        message: "Please provide postType of the posts to get. 'postType' ",
+      });
     } else if (!postUpdatedOfLastElement) {
       res.status(401).json({
         message:
-          "Please provide postUpdatedOfLastElement date of the last posts to get.",
+          "Please provide postUpdatedOfLastElement date of the last posts to get. 'postUpdatedOfLastElement'",
       });
     }
   } catch (error) {
@@ -136,8 +128,6 @@ export async function getPostSizeByType(
       const result = await countPostsByType(postType);
       if (result.operation) {
         res.status(200).json({ result });
-      } else {
-        res.status(404).json({ result });
       }
     } else {
       res
@@ -155,8 +145,6 @@ export async function getAllPostsSize(_: null, res: express.Response) {
     const result = await countAllPosts();
     if (result.operation) {
       res.status(200).json({ result });
-    } else {
-      res.status(404).json({ result });
     }
   } catch (error) {
     res.status(500).json({ message: "Internal server error.", error });
@@ -174,8 +162,6 @@ export async function getPostsSizeByUser(
       const result = await countPostsByUsers(userId);
       if (result.operation) {
         res.status(200).json({ result });
-      } else {
-        res.status(404).json({ result });
       }
     } else {
       res
@@ -197,46 +183,49 @@ export async function createNewPost(
     const upcomingIPOEntry: UPCOMINGIPOLISTTYPES = req.body.post.postInfo;
     // storing post in db
     const RESULT = await createPost(post);
-    const postID = RESULT.newPost?._id;
-    // storing tags linked to current post in db
-    for (let tag of tags) {
-      const TAG_EXIST = await findTag(tag);
-      if (TAG_EXIST.foundTag === null) {
-        const newTAG = await createTag({ tag, id: postID });
-      } else if (TAG_EXIST.foundTag !== null) {
-        const posts = TAG_EXIST.foundTag.posts;
-        const postLinked = posts.filter((post: string) => post === postID);
-        if (postLinked.length === 0) {
-          const updatedTAG = await updateTagByPostID({
-            postID,
-            tagID: TAG_EXIST.foundTag._id,
+    if (RESULT.operation) {
+      const postID = RESULT.newPost?._id;
+      // storing tags linked to current post in db
+      for (let tag of tags) {
+        const TAG_EXIST = await findTag(tag);
+        if (TAG_EXIST.foundTag === null) {
+          const newTAG = await createTag({ tag, id: postID });
+        } else if (TAG_EXIST.foundTag !== null) {
+          const posts = TAG_EXIST.foundTag.posts;
+          const postLinked = posts.filter((post: string) => post === postID);
+          if (postLinked.length === 0) {
+            const updatedTAG = await updateTagByPostID({
+              postID,
+              tagID: TAG_EXIST.foundTag._id,
+            });
+          }
+        }
+      }
+      // storing upcmoingIPO entry and post linking
+      if (post.postInfo.upcomingIPO) {
+        const { ipoName, open, close, linkedPostsId }: UPCOMINGIPOLISTTYPES =
+          upcomingIPOEntry;
+        const searchEntry = await findUpcomingIPOEntryByIPOName(ipoName);
+        // update existing entry
+        if (searchEntry.foundEntry !== null) {
+          const foundEntryId = searchEntry.foundEntry._id;
+          const updateEntry = await addOneLinkedPostId({
+            id: foundEntryId,
+            linkedPostId: postID,
+          });
+        }
+        // create new entry
+        else {
+          const newEntry = await createNewUpcomingIPO({
+            ipoName,
+            open,
+            close,
+            linkedPostsId: [postID],
           });
         }
       }
     }
-    // storing upcmoingIPO entry and post linking
-    if (post.postInfo.upcomingIPO) {
-      const { ipoName, open, close, linkedPostsId }: UPCOMINGIPOLISTTYPES =
-        upcomingIPOEntry;
-      const searchEntry = await findUpcomingIPOEntryByIPOName(ipoName);
-      // update existing entry
-      if (searchEntry.foundEntry !== null) {
-        const foundEntryId = searchEntry.foundEntry._id;
-        const updateEntry = await addOneLinkedPostId({
-          id: foundEntryId,
-          linkedPostId: postID,
-        });
-      }
-      // create new entry
-      else {
-        const newEntry = await createNewUpcomingIPO({
-          ipoName,
-          open,
-          close,
-          linkedPostsId: [postID],
-        });
-      }
-    }
+
     res.status(201).json(RESULT);
   } catch (error) {
     res.status(500).json({
@@ -258,9 +247,11 @@ export async function getTagsRelatedToPost(
       const result = await findTagsRelatedToPost(postId);
       if (result.operation) {
         res.status(200).json({ result });
-      } else {
-        res.status(404).json({ result });
       }
+    } else {
+      res.status(424).json({
+        message: "Please provide id of post of which tags to get. 'postId' ",
+      });
     }
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
@@ -278,10 +269,6 @@ export async function getPostsRelatedToTag(
       const result = await findPostsRelatedToTags(tag);
       if (result.operation) {
         res.status(200).json({ result });
-      } else {
-        res
-          .status(404)
-          .json({ message: `Posts do not exist for tag : ${tag}.`, result });
       }
     } else {
       res.status(401).json({ message: 'Please provide "tag".' });
@@ -314,7 +301,7 @@ export async function getIPOEntryByName(
       res.status(200).json({ RESULT });
     } else {
       res
-        .status(400)
+        .status(424)
         .json({ message: 'Please provide "ipoName" of the entry.' });
     }
   } catch (error) {

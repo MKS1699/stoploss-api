@@ -34,7 +34,7 @@ postRouter.post("/get/id", getPostById);
 postRouter.post("/get/type", getPostsByTypeWithLimit);
 
 // by type with limit but older than last element
-postRouter.get("/get/type/pagination", getPostsByTypeWithLimitOlderElements);
+postRouter.post("/get/type/pagination", getPostsByTypeWithLimitOlderElements);
 
 // posts count
 // by type
@@ -44,13 +44,13 @@ postRouter.post("/count/type", getPostSizeByType);
 postRouter.get("/count/all", getAllPostsSize);
 
 // by user
-postRouter.get("/count/user", getPostsSizeByUser);
+postRouter.post("/count/user", getPostsSizeByUser);
 
 // tags related to post
 postRouter.post("/tags/", getTagsRelatedToPost);
 
 // posts related to tag
-postRouter.post("/tags/posts", getPostsRelatedToTag);
+postRouter.post("/tags/relatedPosts", getPostsRelatedToTag);
 
 // create new post
 postRouter.post("/createPost", verifyToken, createNewPost);
@@ -61,9 +61,9 @@ postRouter.post("/createPost", verifyToken, createNewPost);
 // all entries
 postRouter.get("/upcomingIPO/get", getAllIPOEntries);
 // entry by id
-postRouter.get("/upcomingIPO/get/id", getIPOEntryById);
+postRouter.post("/upcomingIPO/get/id", getIPOEntryById);
 // entry by name
-postRouter.get("/upcomingIPO/get/name", getIPOEntryByName);
+postRouter.post("/upcomingIPO/get/name", getIPOEntryByName);
 
 // creating new entry
 postRouter.post(
