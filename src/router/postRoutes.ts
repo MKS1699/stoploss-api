@@ -9,6 +9,7 @@ import {
   getAllPostsSize,
   getIPOEntryById,
   getIPOEntryByName,
+  getLatestPosts,
   getPostById,
   getPostSizeByType,
   getPostsByTypeWithLimit,
@@ -35,6 +36,9 @@ postRouter.post("/get/type", getPostsByTypeWithLimit);
 
 // by type with limit but older than last element
 postRouter.post("/get/type/pagination", getPostsByTypeWithLimitOlderElements);
+
+// 5 latest posts
+postRouter.get("/get/latest", getLatestPosts);
 
 // posts count
 // by type

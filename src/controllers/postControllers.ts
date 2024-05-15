@@ -13,6 +13,7 @@ import {
   findPostById,
   findPostByTypeWithLimit,
   findPostByTypeWithLimitByDateOfLastElem,
+  latestPosts,
 } from "../db/models/postModels";
 import express from "express";
 import { POST, UPCOMINGIPOLISTTYPES } from "types/@types";
@@ -113,6 +114,22 @@ export async function getPostsByTypeWithLimitOlderElements(
     }
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error." });
+  }
+}
+
+// posts by created/updated as latest
+export async function getLatestPosts(
+  _: express.Request,
+  res: express.Response
+) {
+  try {
+    const result = await latestPosts();
+    res.status(200).json({ result });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error",
+      error,
+    });
   }
 }
 
