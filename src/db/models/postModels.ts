@@ -171,6 +171,40 @@ export async function findPostByTypeWithLimit(
   }
 }
 
+// in desc order of date that is newest first irrespective of category
+export async function latestPosts() {
+  try {
+    const posts = await PostModel.find()
+      .select([
+        "_id",
+        "postImage",
+        "createdBy",
+        "postTitle",
+        "postAuthors",
+        "postType",
+        "postUpdated",
+        "postDescription",
+      ])
+      .sort({
+        postUpdated: -1, // descending order date : new first old last
+      })
+      .limit(5);
+    return {
+      operation: true,
+      message: "Here are latest 5 posts.",
+      statusCode: 1,
+      posts,
+    };
+  } catch (error) {
+    return {
+      error,
+      message: `Error finding latest posts.`,
+      operation: false,
+      statusCode: 0,
+    };
+  }
+}
+
 // in desc order of date of last post of previous fetch
 // by type and limit
 // with specific data only
