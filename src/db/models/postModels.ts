@@ -205,6 +205,56 @@ export async function latestPosts() {
   }
 }
 
+// find posts by a user
+export async function findPostsByUser(
+  userId: string,
+  afterLastPostDate: Date | 0 = 0,
+  limit: number = 10
+) {
+  try {
+    let posts: any[] = [];
+    if (afterLastPostDate == 0) {
+      posts = await PostModel.find({ "createdBy.id": userId })
+        .sort({ postUpdated: -1 })
+        .limit(limit);
+    } else {
+      posts = await PostModel.find({
+        "createdBy.id": userId,
+      })
+        .where({
+          postUpdated: {
+            $lt: afterLastPostDate, // less than the last postUpdated Date of the post
+          },
+        })
+        .sort({ postUpdated: -1 })
+        .limit(limit);
+      console.log(posts);
+    }
+    if (posts.length > 0) {
+      return {
+        posts,
+        message: `Posts created by ${userId}.`,
+        operation: true,
+        statusCode: 1,
+      };
+    } else {
+      return {
+        posts,
+        message: "There are no posts by the user.",
+        operation: true,
+        statusCode: 0,
+      };
+    }
+  } catch (error) {
+    return {
+      error,
+      message: "Unable to get Posts by User",
+      operation: false,
+      statusCode: 0,
+    };
+  }
+}
+
 // in desc order of date of last post of previous fetch
 // by type and limit
 // with specific data only
@@ -389,6 +439,26 @@ export async function countPostsByUsers(userId: POST["createdBy"]["id"]) {
     return {
       message: "Error counting posts by user.",
       error,
+      operation: false,
+      statusCode: 0,
+    };
+  }
+}
+
+// delete post by id
+export async function deletePostById(postId: string) {
+  try {
+    const deletedPost = await PostModel.findByIdAndDelete(postId);
+    return {
+      deletedPost,
+      operation: true,
+      statusCode: 1,
+      message: `Post with id : ${postId} deleted.`,
+    };
+  } catch (error) {
+    return {
+      error,
+      message: "Error while deleting post",
       operation: false,
       statusCode: 0,
     };

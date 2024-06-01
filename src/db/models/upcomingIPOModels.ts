@@ -118,6 +118,30 @@ export async function findUpcomingIPOEntryByID(id: string) {
   }
 }
 
+// by linked Posts id
+export async function findUpcomingIPOEntryByLinkedPostId(linkedPostId: string) {
+  try {
+    const entry = await UpcomingIPOModel.findOne({
+      linkedPostsId: linkedPostId,
+    });
+
+    // if(entry.length )
+    return {
+      entry,
+      message: "Found entry linked to post.",
+      operation: true,
+      statusCode: 1,
+    };
+  } catch (error) {
+    return {
+      error,
+      message: "Error finding linked entry.",
+      operation: false,
+      statusCode: 0,
+    };
+  }
+}
+
 // updating ipo entry
 
 // updating ipoName
