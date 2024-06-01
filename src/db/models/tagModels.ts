@@ -123,3 +123,80 @@ export async function findPostsRelatedToTags(tag: string) {
     };
   }
 }
+
+// find tag and posts by postId related to tag
+export async function findTagsnPostsRelatedToPostId(postId: string) {
+  try {
+    const tags = await TagModel.find({ posts: postId });
+    if (tags.length > 0) {
+      return {
+        tags,
+        message: `Tags n posts related to post with id : ${postId}.`,
+        operation: true,
+        statusCode: 1,
+      };
+    } else {
+      return {
+        tags,
+        message: `Tags n posts do not exist for post with id  :${postId}.`,
+        operation: true,
+        statusCode: 0,
+      };
+    }
+  } catch (error) {
+    return {
+      error,
+      message: "Error finding tags n posts by postId.",
+      operation: false,
+      statusCode: 0,
+    };
+  }
+}
+
+// remove a single post linked to tag
+export async function removePostRelatedToTag(tagId: string, postId: string) {
+  try {
+    const TAG = await TagModel.findById(tagId);
+    if (TAG) {
+      const { _id, tag, posts } = TAG;
+      const newPostArray = posts.filter((id: string) => id !== postId);
+      const updatedTag = await TagModel.findByIdAndUpdate(tagId, {
+        posts: newPostArray,
+      });
+
+      return {
+        statusCode: 1,
+        operation: true,
+        updatedTag,
+        message: "Tag updated successfully",
+      };
+    }
+  } catch (error) {
+    return {
+      error,
+      message: "Error while updating posts related to tag.",
+      operation: false,
+      statusCode: 0,
+    };
+  }
+}
+
+// deleting tag
+export async function deleteTagByTagId(tagId: string) {
+  try {
+    const deletedTag = await TagModel.findByIdAndDelete(tagId);
+    return {
+      deletedTag,
+      operation: true,
+      message: "Tag deleted successfully",
+      statusCode: 1,
+    };
+  } catch (error) {
+    return {
+      error,
+      message: "Error deleting tag.",
+      operation: false,
+      statusCode: 0,
+    };
+  }
+}

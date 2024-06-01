@@ -1,8 +1,11 @@
 import {
   createTag,
+  deleteTagByTagId,
   findPostsRelatedToTags,
   findTag,
   findTagsRelatedToPost,
+  findTagsnPostsRelatedToPostId,
+  removePostRelatedToTag,
   updateTagByPostID,
 } from "../db/models/tagModels";
 import {
@@ -10,9 +13,11 @@ import {
   countPostsByType,
   countPostsByUsers,
   createPost,
+  deletePostById,
   findPostById,
   findPostByTypeWithLimit,
   findPostByTypeWithLimitByDateOfLastElem,
+  findPostsByUser,
   latestPosts,
 } from "../db/models/postModels";
 import express from "express";
@@ -26,6 +31,7 @@ import {
   findAllUpcomingIPOEntries,
   findUpcomingIPOEntryByID,
   findUpcomingIPOEntryByIPOName,
+  findUpcomingIPOEntryByLinkedPostId,
   updateUpcomingIPOEntryClose,
   updateUpcomingIPOEntryIPOName,
   updateUpcomingIPOEntryOpen,
@@ -53,6 +59,45 @@ export async function getPostById(req: express.Request, res: express.Response) {
       message: "Internal Server Error.",
       error,
     });
+  }
+}
+
+// by user
+export async function getPostsByUser(
+  req: express.Request,
+  res: express.Response
+) {
+  try {
+    const {
+      userId,
+      limit,
+      fromLastPostDate,
+    }: {
+      userId: string;
+      limit: number;
+      fromLastPostDate: Date;
+    } = req.body;
+    if (userId) {
+      const result = await findPostsByUser(userId, fromLastPostDate, limit);
+      if (result.statusCode == 1 && result.operation == true) {
+        res.status(200).json({
+          result,
+        });
+      } else if ((result.statusCode = 0 && result.operation == true)) {
+        res.status(200).json({
+          result,
+          message: `There are no posts by the user ${userId}`,
+        });
+      } else if ((result.statusCode = 0 && result.operation == false)) {
+        res
+          .status(500)
+          .json({ result, message: `Error occurred while finding posts.` });
+      }
+    } else {
+      res.status(401).json({ message: "UserId not provided" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
 }
 
@@ -292,6 +337,76 @@ export async function getPostsRelatedToTag(
     }
   } catch (error) {
     res.status(500).json({ message: "Internal server error." });
+  }
+}
+
+// delete post
+/* 
+ keep in mind
+ - get post details to check for the upcoming entry as well as tags
+  -- done (post details)
+ - type of post if ipo and upcoming ipo linked then delete its linking from the entry too -- done(postType == ipo then entries fetched)
+  -linking only if multiple linking
+  -whole entry if single linking
+ - delete its linking with tags
+    - if tag is just linked with this then delete the tag too --done
+    - else delete its linking only --done
+ - delete the post finally -- done
+  */
+
+//  delete post from the db and its linking
+export async function deletePost(req: express.Request, res: express.Response) {
+  try {
+    const { postId } = req.body;
+    // checking postId
+    if (postId) {
+      const post = await findPostById(postId); // find post
+      if (post.statusCode == 1 && post.operation == true) {
+        const { postType } = post.post;
+        const tagsRelatedToPost = await findTagsnPostsRelatedToPostId(postId);
+        const { tags } = tagsRelatedToPost;
+        // ipo related upcomingipo entries
+        // deleting/updating entry
+        if (postType == "ipo") {
+          const entryRelatedToPost = await findUpcomingIPOEntryByLinkedPostId(
+            postId
+          );
+          const { entry } = entryRelatedToPost;
+          const { _id, linkedPostsId, ipoName } = entry;
+
+          if (linkedPostsId.length > 1) {
+            await deleteOneLinkedPostId({ id: _id, linkedPostId: postId });
+          } else {
+            await deleteUpcomingIPOEntryById(_id);
+          }
+        }
+        // deleting/updating tags and deleting post
+        for (let tag of tags) {
+          const { _id: tagId, posts } = tag;
+          // updating tag
+          if (posts.length > 1) {
+            await removePostRelatedToTag(tagId, postId);
+          }
+          // deleting tag
+          else {
+            await deleteTagByTagId(tagId);
+          }
+        }
+        // deleting post
+        await deletePostById(postId);
+        res.status(201).json({ message: "Post deleted successfully" });
+      } else {
+        res
+          .status(403)
+          .json({ message: `Post with ${postId} does not exists.` });
+      }
+    } else {
+      res
+        .status(401)
+        .json({ message: "Please provide postId of the post to delete." });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error.", error });
   }
 }
 

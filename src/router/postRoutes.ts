@@ -4,6 +4,7 @@ import {
   addOneLinkedPost,
   createNewPost,
   createNewUpcomingIPOListEntry,
+  deletePost,
   deleteUpcomingIPOEntry,
   getAllIPOEntries,
   getAllPostsSize,
@@ -14,6 +15,7 @@ import {
   getPostSizeByType,
   getPostsByTypeWithLimit,
   getPostsByTypeWithLimitOlderElements,
+  getPostsByUser,
   getPostsRelatedToTag,
   getPostsSizeByUser,
   getTagsRelatedToPost,
@@ -40,6 +42,9 @@ postRouter.post("/get/type/pagination", getPostsByTypeWithLimitOlderElements);
 // 5 latest posts
 postRouter.get("/get/latest", getLatestPosts);
 
+// by userId
+postRouter.post("/get/user", getPostsByUser);
+
 // posts count
 // by type
 postRouter.post("/count/type", getPostSizeByType);
@@ -58,6 +63,10 @@ postRouter.post("/tags/relatedPosts", getPostsRelatedToTag);
 
 // create new post
 postRouter.post("/createPost", verifyToken, createNewPost);
+
+// deleting a post
+postRouter.delete("/delete", deletePost);
+
 
 // upcoming ipo list related post routes
 
