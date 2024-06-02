@@ -228,7 +228,6 @@ export async function findPostsByUser(
         })
         .sort({ postUpdated: -1 })
         .limit(limit);
-      console.log(posts);
     }
     if (posts.length > 0) {
       return {
