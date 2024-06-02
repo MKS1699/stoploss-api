@@ -341,20 +341,6 @@ export async function getPostsRelatedToTag(
 }
 
 // delete post
-/* 
- keep in mind
- - get post details to check for the upcoming entry as well as tags
-  -- done (post details)
- - type of post if ipo and upcoming ipo linked then delete its linking from the entry too -- done(postType == ipo then entries fetched)
-  -linking only if multiple linking
-  -whole entry if single linking
- - delete its linking with tags
-    - if tag is just linked with this then delete the tag too --done
-    - else delete its linking only --done
- - delete the post finally -- done
-  */
-
-//  delete post from the db and its linking
 export async function deletePost(req: express.Request, res: express.Response) {
   try {
     const { postId } = req.body;
