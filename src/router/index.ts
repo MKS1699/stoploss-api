@@ -1,3 +1,4 @@
 import userRouter from "./userroutes";
 import postRouter from "./postRoutes";
-export { userRouter, postRouter };
+import ipoRouter from "./ipoRoutes";
+export { userRouter, postRouter, ipoRouter };

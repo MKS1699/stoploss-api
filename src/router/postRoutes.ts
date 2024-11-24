@@ -1,5 +1,5 @@
 // important : All post routes other than GET will need to have verifyToken middleware
-import { verifyToken } from "../middleware";
+import { verifyCreatorAndExecutioner, verifyToken } from "../middleware";
 import {
   addOneLinkedPost,
   createNewPost,
@@ -65,8 +65,12 @@ postRouter.post("/tags/relatedPosts", getPostsRelatedToTag);
 postRouter.post("/createPost", verifyToken, createNewPost);
 
 // deleting a post
-postRouter.delete("/delete", deletePost);
-
+postRouter.delete(
+  "/delete",
+  verifyToken,
+  verifyCreatorAndExecutioner,
+  deletePost
+);
 
 // upcoming ipo list related post routes
 
