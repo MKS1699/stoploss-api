@@ -7,6 +7,7 @@ import {
   deletePost,
   deleteUpcomingIPOEntry,
   getAllIPOEntries,
+  getAllPosts,
   getAllPostsSize,
   getIPOEntryById,
   getIPOEntryByName,
@@ -71,6 +72,9 @@ postRouter.delete(
   verifyCreatorAndExecutioner,
   deletePost
 );
+
+// get all posts
+postRouter.get("/get/all", verifyToken, getAllPosts);
 
 // upcoming ipo list related post routes
 

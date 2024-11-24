@@ -18,6 +18,7 @@ import {
   findPostByTypeWithLimit,
   findPostByTypeWithLimitByDateOfLastElem,
   findPostsByUser,
+  getAllPostsForSearch,
   latestPosts,
 } from "../db/models/postModels";
 import express from "express";
@@ -396,6 +397,15 @@ export async function deletePost(req: express.Request, res: express.Response) {
   }
 }
 
+// get all the posts for search
+export async function getAllPosts(_: express.Request, res: express.Response) {
+  try {
+    const result = await getAllPostsForSearch();
+    res.status(200).json({ result });
+  } catch (error) {
+    res.status(500).json({ error, message: "Internal Server Error" });
+  }
+}
 /* This section deals with upcoming IPO List creation */
 // get all ipo entries
 export async function getAllIPOEntries(_: null, res: express.Response) {

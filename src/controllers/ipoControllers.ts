@@ -31,7 +31,7 @@ export async function createIPO(req: express.Request, res: express.Response) {
       allotmentStatus,
       ipoPhase,
       createdBy,
-    }: IPOTYPES = req.body;
+    }: IPOTYPES = req.body.ipo;
 
     const result = await createNewIPO({
       category,

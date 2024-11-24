@@ -32,13 +32,13 @@ ipoRouter.post("/get/user/id", getIPOCreatedByUserId);
 ipoRouter.post("/get/user/name", getIPOCreatedByUserName);
 
 // update
-ipoRouter.post("/update", verifyToken, updateIPO);
+ipoRouter.put("/update", verifyToken, updateIPO);
 
 // add postId to IPO
-ipoRouter.post("/update/add/postId", verifyToken, addPostIdToIPO);
+ipoRouter.put("/update/add/postId", verifyToken, addPostIdToIPO);
 
 // delete postId from IPO
-ipoRouter.delete("/update/remove/postId", verifyToken, deletePostIdFromIPO);
+ipoRouter.put("/update/remove/postId", verifyToken, deletePostIdFromIPO);
 
 // delete ipo
 ipoRouter.delete(

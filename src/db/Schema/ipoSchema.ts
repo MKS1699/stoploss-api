@@ -54,7 +54,7 @@ const ipoSchema: mongoose.Schema = new mongoose.Schema({
     required: true,
   },
   status: {
-    type: String, // "pre-apply" | "apply / live" | "closed"
+    type: String, // "pre" | "apply" | "closed"
     required: true,
   },
   linkedPostsId: {
@@ -62,7 +62,7 @@ const ipoSchema: mongoose.Schema = new mongoose.Schema({
     required: false,
   },
   ipoPhase: {
-    type: String,
+    type: String, // 'current' | 'upcoming' | 'listed'
     required: true,
   },
   allotmentLink: {
