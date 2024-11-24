@@ -463,3 +463,41 @@ export async function deletePostById(postId: string) {
     };
   }
 }
+
+// get all the posts (title, image, description , authors & Id )
+// in postUpdate descending format latest first
+// for search purpose (searching will be done in the browser)
+export async function getAllPostsForSearch() {
+  try {
+    const posts = await PostModel.find()
+      .select([
+        "postTitle",
+        "_id",
+        "postImage",
+        "postAuthors",
+        "postDescription",
+        "postUpdated",
+      ])
+      .sort({ postUpdated: -1 });
+
+    if (posts.length > 0) {
+      return {
+        posts,
+        message: "Posts found.",
+        operation: "success",
+      };
+    } else {
+      return {
+        posts,
+        message: "No Posts are there in the db.",
+        operation: "fail",
+      };
+    }
+  } catch (error) {
+    return {
+      error,
+      message: "Error finding posts.",
+      operation: "error",
+    };
+  }
+}

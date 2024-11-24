@@ -36,7 +36,7 @@ export async function createUser(req: express.Request, res: express.Response) {
       });
     }
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ message: "Internal Server Error", error });
   }
 }
 
@@ -44,7 +44,7 @@ export async function createUser(req: express.Request, res: express.Response) {
 export async function updateUser(req: express.Request, res: express.Response) {
   try {
     const { fieldToUpdate } = req.body;
-    // user name updation
+    // user name updating
     if (fieldToUpdate === "name") {
       const { newUserName, id } = req.body;
       const result = await updateUserName(id, newUserName);
@@ -68,7 +68,7 @@ export async function updateUser(req: express.Request, res: express.Response) {
       }
     }
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error, message: "Internal Server Error" });
   }
 }
 
@@ -83,7 +83,7 @@ export async function userDelete(req: express.Request, res: express.Response) {
       res.status(400).json(result);
     }
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({ error, message: "Internal Server Error" });
   }
 }
 

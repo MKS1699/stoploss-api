@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import { findUserByUserName, getUserPassword } from "../db/models/userModels";
 import { createToken } from "../tools";
 import jwt from "jsonwebtoken";
+import { findIPObyId, getIPOByUserId } from "../db/models/ipoModels";
+import { findPostById } from "../db/models/postModels";
 
 /* middleware for checking if user exists or not and acts
  * according to the path the req is coming from, if it is
@@ -48,7 +50,7 @@ export async function userExist(
       res.status(400).json(result.error);
     }
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json({ error, message: "Internal Server Error" });
   }
 }
 
@@ -70,7 +72,7 @@ export async function passwordHash(
       next();
     }
   } catch (error) {
-    res.status(500).json(error);
+    res.status(500).json({ error, message: "Internal Server Error" });
   }
 }
 
@@ -80,28 +82,32 @@ export async function validateCredentials(
   res: express.Response,
   next: express.NextFunction
 ) {
-  const { userName, userPassword } = req.body;
-  if (typeof userName && typeof userPassword === "string") {
-    if (userName.length >= 4 && userName.length <= 10) {
-      if (userPassword.length >= 8 && userPassword.length <= 20) {
-        next();
+  try {
+    const { userName, userPassword } = req.body;
+    if (typeof userName && typeof userPassword === "string") {
+      if (userName.length >= 4 && userName.length <= 10) {
+        if (userPassword.length >= 8 && userPassword.length <= 20) {
+          next();
+        } else {
+          res.status(400).json({
+            operation: "Error",
+            message: "User Password provided is not valid.",
+          });
+        }
       } else {
         res.status(400).json({
           operation: "Error",
-          message: "User Password provided is not valid.",
+          message: "User Name provided is not valid.",
         });
       }
     } else {
-      res.status(400).json({
+      res.status(403).json({
         operation: "Error",
-        message: "User Name provided is not valid.",
+        message: "userName & userPassword provided must be string.",
       });
     }
-  } else {
-    res.status(403).json({
-      operation: "Error",
-      message: "userName & userPassword provided must be string",
-    });
+  } catch (error) {
+    res.status(500).json({ error, message: "Internal Server Error." });
   }
 }
 
@@ -117,7 +123,7 @@ export async function generateToken(
     req.body.generatedToken = token;
     next();
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error, message: "Internal Server Error." });
   }
 }
 
@@ -147,9 +153,9 @@ export async function verifyToken(
           });
         } else {
           req.body.userId = decode.payload;
+          next();
         }
       });
-      next();
     }
   } catch (error) {
     res.status(500).json({
@@ -189,6 +195,71 @@ export async function passwordCheck(
       operation: "error",
       message: "Password Verification Failed",
       error,
+    });
+  }
+}
+
+// middleware : verifying creator and executioner are same
+// user for deletion of posts or IPO card
+export async function verifyCreatorAndExecutioner(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  try {
+    const originalUrl = req.originalUrl.toString();
+
+    const {
+      // userId is provided by the verifyToken middleware
+      userId,
+      // id of the post or ipo
+      itemId,
+    }: { userId: string; itemId: string } = req.body;
+    if (originalUrl == "/api/ipo/delete") {
+      const result = await findIPObyId(itemId);
+      const { ipo, operation } = result;
+      if (operation === "success") {
+        if (ipo.createdBy.userId === userId) {
+          // this will add ipoId in the request body for the deleteIPO
+          req.body.ipoId = itemId;
+          // it will call deleteIPO
+          next();
+        } else {
+          res.status(403).json({
+            message: `This IPO is not created by you.`,
+          });
+        }
+      } else if (operation === "fail") {
+        res.status(202).json({ result });
+      } else if (operation === "error") {
+        res.status(400).json({ result });
+      }
+    } else if (originalUrl === "/api/posts/delete") {
+      const result = await findPostById(itemId);
+      const { post, operation, statusCode } = result;
+      if (operation) {
+        if (statusCode === 1) {
+          if (post.createdBy.id === userId) {
+            // this will add postId in the request body for the deletePost
+            req.body.postId = itemId;
+            // it will call deletePost
+            next();
+          } else {
+            res
+              .status(403)
+              .json({ message: `This post is not created by you.` });
+          }
+        } else if (statusCode === 0) {
+          res.status(202).json({ result });
+        }
+      } else {
+        res.status(400).json({ result });
+      }
+    }
+  } catch (error) {
+    res.status(500).json({
+      error,
+      message: "Internal Server Error.",
     });
   }
 }

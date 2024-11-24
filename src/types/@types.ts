@@ -57,3 +57,34 @@ export interface UPCOMINGIPOLISTTYPES {
   close: string;
   linkedPostsId: string[];
 }
+
+// IPO types
+export interface IPOTYPES {
+  name: string;
+  logo: {
+    // contains url of the images uploaded at imgbb
+    // as of 24-09-2024
+    original: string;
+    medium: string;
+    thumbnail: string;
+  };
+  dates: {
+    open: string;
+    close: string;
+    listing: string;
+  };
+  category: "mainboard" | "sme";
+  offerPrice: string;
+  lotSize: string;
+  subscription: string;
+  exPremium: string;
+  status: "pre-apply" | "apply" | "closed"; // "apply" == "live" will interchanged in frontend
+  allotmentLink: string; // will direct to registrar link for checking allotment status
+  allotmentStatus: boolean; // this will be used to show check allotment button
+  ipoPhase: "current" | "upcoming" | "listed";
+  linkedPostsId: string[];
+  createdBy: {
+    userName: string;
+    userId: string;
+  };
+}

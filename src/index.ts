@@ -2,8 +2,9 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { stoplossConnect } from "./db/connection/connect_db";
-import { postRouter, userRouter } from "./router";
+import { postRouter, userRouter, ipoRouter } from "./router";
 import path from "path";
+import bodyParser from "body-parser";
 
 const PORT = process.env.PORT || 6969;
 const app = express();
@@ -13,19 +14,27 @@ app.use(
     credentials: true,
   })
 );
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 
 // static files (public html serving)
-app.use("/", express.static(path.join(__dirname, "public")));
+// app.use("/", express.static(path.join(__dirname, "public")));
 // All the API routes are added from here.
 // Users API Routes
 app.use("/api/users", userRouter);
 // POST API Routes
 app.use("/api/posts", postRouter);
 
+// ipo routes
+app.use("/api/ipo/", ipoRouter);
+
 /* This is a cron-job path for keeping the service active
- * always while using free web service instance from render.
+ * always while using free web service instance from render.com
  */
 app.get("/cronjob", (_, res: express.Response) => {
   try {
