@@ -1,6 +1,12 @@
 import { IPOTYPES } from "types/@types";
 import { IPOModel } from "../Schema";
 import { checkForDuplicate } from "../../tools";
+import {
+  DATABASE_CODE_ENUM,
+  DATABASE_RESPONSE_RESULT,
+  DATABASE_RESPONSES_DETAILS,
+  DBResponseMessage,
+} from "tools/databaseResponseCodes";
 
 // create new ipo
 export async function createNewIPO({
@@ -18,7 +24,7 @@ export async function createNewIPO({
   allotmentLink,
   allotmentStatus,
   createdBy,
-}: IPOTYPES) {
+}: IPOTYPES): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const newIPO: IPOTYPES = await IPOModel.create({
       name,
@@ -37,124 +43,179 @@ export async function createNewIPO({
       createdBy,
     });
     return {
-      message: "New IPO created.",
-      operation: "success",
-      newIPO,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_CREATE_SUCCESS
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_CREATE_SUCCESS,
+      result: newIPO,
+      success: true,
     };
   } catch (error) {
     return {
-      message: "Error creating New IPO.",
-      operation: "error",
-      error,
+      message: DBResponseMessage(DATABASE_CODE_ENUM.DB_IPO_CARDS_CREATE_ERROR),
+      responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_CREATE_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // find ipo
 // by id
-export async function findIPObyId(id: string) {
+export async function findIPObyId(
+  id: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const ipo = await IPOModel.findById(id);
     if (ipo !== null) {
       return {
-        message: "IPO found.",
-        operation: "success",
-        ipo,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_ID_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_ID_SUCCESS,
+        result: ipo,
+        success: true,
       };
     } else {
       return {
-        message: `IPO with ${id} does not exist.`,
-        operation: "fail",
-        ipo,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: "Error finding IPO by Id.",
-      operation: "error",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_ID_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 // by name
-export async function findIPObyName(name: string) {
+export async function findIPObyName(
+  name: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const ipo = await IPOModel.findOne({ name: name });
     if (ipo !== null) {
       return {
-        message: "IPO found.",
-        operation: "success",
-        ipo,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_NAME_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_NAME_SUCCESS,
+        result: ipo,
+        success: true,
       };
     } else {
       return {
-        message: `IPO with ${name} does not exist.`,
-        operation: "fail",
-        ipo,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_NAME_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_NAME_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: "Error finding IPO by Name.",
-      operation: "error",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_NAME_QUERY_ERROR
+      ),
+      responseCode:
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_IPO_NAME_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // by created user
 // user name
-export async function getIPOByUserName(userName: string) {
+export async function getIPOByUserName(
+  userName: string
+): Promise<DATABASE_RESPONSE_RESULT<any[]>> {
   try {
     const ipo = await IPOModel.find({
       "createdBy.userName": userName,
     });
     if (ipo.length > 0) {
       return {
-        message: "IPO found.",
-        operation: "success",
-        ipo,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_NAME_CREATED_SUCCESS
+        ),
+        responseCode:
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_NAME_CREATED_SUCCESS,
+        result: ipo,
+        success: true,
       };
     } else {
       return {
-        message: `IPO create by user : ${userName} does not exist.`,
-        operation: "fail",
-        ipo,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_NAME_CREATED_ERROR
+        ),
+        responseCode:
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_NAME_CREATED_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: `Error finding IPO created by user : ${userName}`,
-      operation: "error",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_NAME_CREATED_QUERY_ERROR
+      ),
+      responseCode:
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_NAME_CREATED_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // by user Id
-export async function getIPOByUserId(userId: string) {
+export async function getIPOByUserId(
+  userId: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const ipo = await IPOModel.find({
       "createdBy.userId": userId,
     });
     if (ipo.length > 0) {
       return {
-        message: "IPO found.",
-        operation: "success",
-        ipo,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_ID_CREATED_SUCCESS
+        ),
+        responseCode:
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_ID_CREATED_SUCCESS,
+        result: ipo,
+        success: true,
       };
     } else {
       return {
-        message: `IPO created by user with id : ${userId} does not exist.`,
-        operation: "fail",
-        ipo,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_ID_CREATED_ERROR
+        ),
+        responseCode:
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_ID_CREATED_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: `Error finding IPO created by user with id : ${userId}`,
-      operation: "error",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_ID_CREATED_QUERY_ERROR
+      ),
+      responseCode:
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_BY_USER_ID_CREATED_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
@@ -167,35 +228,47 @@ export async function findIPOAndUpdate({
 }: {
   id: string;
   ipoUpdate: IPOTYPES;
-}) {
+}): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const updatedIPO = await IPOModel.findByIdAndUpdate(id, ipoUpdate, {
       new: true,
     });
     if (updatedIPO !== null) {
       return {
-        message: "IPO found and updated.",
-        operation: "success",
-        updatedIPO,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_SUCCESS,
+        result: updatedIPO,
+        success: true,
       };
     } else {
       return {
-        message: `IPO with ${id} not found.`,
-        operation: "fail",
-        updatedIPO,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: "Error finding IPO by Name.",
-      operation: "error",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // add a postId to linkedPostsId of a ipo
-export async function addPostIdToIPOByIPOId(postId: string, ipoId: string) {
+export async function addPostIdToIPOByIPOId(
+  postId: string,
+  ipoId: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const IPO: IPOTYPES = await IPOModel.findById(ipoId);
     if (IPO !== null) {
@@ -210,29 +283,45 @@ export async function addPostIdToIPOByIPOId(postId: string, ipoId: string) {
           { new: true }
         );
         return {
-          message: "Post Id added successfully to IPO.",
-          operation: "success",
-          updatedIPO,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_ADD_BY_IPO_ID_SUCCESS
+          ),
+          responseCode:
+            DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_ADD_BY_IPO_ID_SUCCESS,
+          result: updatedIPO,
+          success: true,
         };
       } else {
         return {
-          message: "Post already linked with IPO.",
-          operation: "duplicate",
-          IPO,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_ADD_BY_IPO_ID_DUPLICATE_ERROR
+          ),
+          responseCode:
+            DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_ADD_BY_IPO_ID_DUPLICATE_ERROR,
+          result: null,
+          success: false,
         };
       }
     } else {
       return {
-        message: `IPO with ${ipoId} doesn't exist.`,
-        operation: "fail",
-        IPO,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_ADD_BY_IPO_ID_ERROR
+        ),
+        responseCode:
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_ADD_BY_IPO_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: "Error while adding postId to IPO.",
-      operation: "error",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_ADD_BY_IPO_ID_QUERY_ERROR
+      ),
+      responseCode:
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_ADD_BY_IPO_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
@@ -241,7 +330,7 @@ export async function addPostIdToIPOByIPOId(postId: string, ipoId: string) {
 export async function removePostIdFromIPOByIPOId(
   postId: string,
   ipoId: string
-) {
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const IPO: IPOTYPES = await IPOModel.findById(ipoId);
     if (IPO !== null) {
@@ -256,81 +345,118 @@ export async function removePostIdFromIPOByIPOId(
           { new: true }
         );
         return {
-          message: "Post Id removed successfully from IPO.",
-          operation: "success",
-          updatedIPO,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_REMOVE_BY_IPO_ID_SUCCESS
+          ),
+          responseCode:
+            DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_REMOVE_BY_IPO_ID_SUCCESS,
+          result: updatedIPO,
+          success: true,
         };
       } else {
         return {
-          message: "PostId is not linked with IPO.",
-          operation: null,
-          IPO,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_REMOVE_BY_IPO_ID_MISSING_ERROR
+          ),
+          responseCode:
+            DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_REMOVE_BY_IPO_ID_MISSING_ERROR,
+          result: null,
+          success: false,
         };
       }
     } else {
       return {
-        message: `IPO with ${ipoId} doesn't exist.`,
-        operation: "fail",
-        IPO,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_REMOVE_BY_IPO_ID_ERROR
+        ),
+        responseCode:
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_REMOVE_BY_IPO_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: "Error while deleting postId from IPO.",
-      operation: "error",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_REMOVE_BY_IPO_ID_QUERY_ERROR
+      ),
+      responseCode:
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_UPDATE_POST_ID_REMOVE_BY_IPO_ID_QUERY_ERROR,
+      result: null,
+      success: false,
     };
   }
 }
 
 // delete ipo by id and name
-export async function deleteIPOById(id: string) {
+export async function deleteIPOById(
+  id: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const deletedIPO = await IPOModel.findByIdAndDelete(id);
     if (deletedIPO !== null) {
       return {
-        message: "IPO deleted successfully.",
-        operation: "success",
-        deletedIPO,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_DELETE_BY_IPO_ID_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_DELETE_BY_IPO_ID_SUCCESS,
+        result: deletedIPO,
+        success: true,
       };
     } else {
       return {
-        message: `IPO does not exists with id : ${id} .`,
-        operation: "fail",
-        deletedIPO,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_DELETE_BY_IPO_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_DELETE_BY_IPO_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: "Error while deleting IPO.",
-      operation: "error",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_DELETE_BY_IPO_ID_QUERY_ERROR
+      ),
+      responseCode:
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_DELETE_BY_IPO_ID_QUERY_ERROR,
+      result: null,
+      success: false,
     };
   }
 }
 
 //get all the IPO in one go
-export async function findAllIPO() {
+export async function findAllIPO(): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const ALL_IPO = await IPOModel.find();
     if (ALL_IPO.length > 0) {
       return {
-        message: "All IPO fetched successfully.",
-        operation: "success",
-        ALL_IPO,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_ALL_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_ALL_SUCCESS,
+        result: ALL_IPO,
+        success: true,
       };
     } else {
       return {
-        message: "No IPO stored in the DB.",
-        operation: "fail",
-        ALL_IPO,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_ALL_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_ALL_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: "Error while getting all the IPO.",
-      operation: "error",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_ALL_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_IPO_CARDS_FIND_ALL_QUERY_ERROR,
+      result: null,
+      success: false,
     };
   }
 }

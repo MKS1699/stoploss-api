@@ -1,37 +1,69 @@
+import {
+  DATABASE_CODE_ENUM,
+  DATABASE_RESPONSE_RESULT,
+  DBResponseMessage,
+} from "tools/databaseResponseCodes";
 import { TagModel } from "../Schema";
 
 // creating a new tag
-export async function createTag({ tag, id }: { tag: string; id: string }) {
+export async function createTag({
+  tag,
+  id,
+}: {
+  tag: string;
+  id: string;
+}): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const TAG = await TagModel.create({ tag, posts: id });
     return {
-      message: "Tag created successfully for the post.",
-      operation: "success",
-      TAG,
+      message: DBResponseMessage(DATABASE_CODE_ENUM.DB_TAG_CREATE_SUCCESS),
+      responseCode: DATABASE_CODE_ENUM.DB_TAG_CREATE_SUCCESS,
+      result: TAG,
+      success: true,
     };
   } catch (error) {
     return {
-      message: "Unable to create tag for the post.",
-      operation: "fail",
-      error,
+      message: DBResponseMessage(DATABASE_CODE_ENUM.DB_TAG_CREATE_ERROR),
+      responseCode: DATABASE_CODE_ENUM.DB_TAG_CREATE_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // finding a existing tag
-export async function findTag(tag: string) {
+export async function findTag(
+  tag: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const foundTag = await TagModel.findOne({ tag });
-    return {
-      message: "Tag found",
-      operation: "success",
-      foundTag,
-    };
+    if (foundTag !== null) {
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_FIND_BY_TAG_NAME_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_BY_TAG_NAME_SUCCESS,
+        result: foundTag,
+        success: true,
+      };
+    } else {
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_FIND_BY_TAG_NAME_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_BY_TAG_NAME_ERROR,
+        result: null,
+        success: false,
+      };
+    }
   } catch (error) {
     return {
-      message: "Unable to found tag",
-      operation: "fail",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_TAG_FIND_BY_TAG_NAME_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_BY_TAG_NAME_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
@@ -45,116 +77,162 @@ export async function updateTagByPostID({
   postID: string;
   tagID: string;
   //   posts : string[]
-}) {
+}): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     // const newPostsArr : string[] = [...posts, postID];
     const updatedTAG = await TagModel.findByIdAndUpdate(tagID, {
       $push: { posts: postID },
     });
 
-    return {
-      message: "Post linked to existing tag.",
-      operation: "success",
-      updatedTAG,
-    };
+    if (updatedTAG !== null) {
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_UPDATE_ADD_POST_BY_TAG_ID_SUCCESS
+        ),
+        responseCode:
+          DATABASE_CODE_ENUM.DB_TAG_UPDATE_ADD_POST_BY_TAG_ID_SUCCESS,
+        result: updatedTAG,
+        success: true,
+      };
+    } else {
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_UPDATE_BY_TAG_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_UPDATE_BY_TAG_ID_ERROR,
+        result: null,
+        success: false,
+      };
+    }
   } catch (error) {
     return {
-      message: "Unable to link post to tag.",
-      operation: "fail",
-      error,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_TAG_UPDATE_ADD_POST_BY_TAG_ID_QUERY_ERROR
+      ),
+      responseCode:
+        DATABASE_CODE_ENUM.DB_TAG_UPDATE_ADD_POST_BY_TAG_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // find tag related to specific post
-export async function findTagsRelatedToPost(postId: string) {
+export async function findTagsRelatedToPost(
+  postId: string
+): Promise<DATABASE_RESPONSE_RESULT<any[]>> {
   try {
     const tags = await TagModel.find({ posts: postId }).select(["tag"]);
     if (tags.length > 0) {
       return {
-        tags,
-        message: `Tags related to post with id : ${postId}.`,
-        operation: true,
-        statusCode: 1,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_SUCCESS,
+        result: tags,
+        success: true,
       };
     } else {
       return {
-        tags,
-        message: `Tags do not exist for post with id  :${postId}.`,
-        operation: true,
-        statusCode: 0,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      message: "Error finding tags related to post.",
-      error,
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // find posts related to tag
-export async function findPostsRelatedToTags(tag: string) {
+export async function findPostsRelatedToTags(
+  tag: string
+): Promise<DATABASE_RESPONSE_RESULT<any[]>> {
   try {
     const posts = await TagModel.find({ tag }).select(["posts"]);
     if (posts.length > 0) {
       return {
-        posts,
-        message: `Posts related to tag: "${tag}" .`,
-        operation: true,
-        statusCode: 1,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_FIND_POST_BY_TAG_NAME_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_POST_BY_TAG_NAME_SUCCESS,
+        result: posts,
+        success: true,
       };
     } else {
       return {
-        posts,
-        operation: true,
-        message: "Posts do not exist for tag.",
-        statusCode: 0,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_FIND_POST_BY_TAG_NAME_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_POST_BY_TAG_NAME_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      error,
-      message: "Error finding posts related to tag.",
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_TAG_FIND_POST_BY_TAG_NAME_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_POST_BY_TAG_NAME_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // find tag and posts by postId related to tag
-export async function findTagsnPostsRelatedToPostId(postId: string) {
+export async function findTagsnPostsRelatedToPostId(
+  postId: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const tags = await TagModel.find({ posts: postId });
     if (tags.length > 0) {
       return {
-        tags,
-        message: `Tags n posts related to post with id : ${postId}.`,
-        operation: true,
-        statusCode: 1,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_SUCCESS,
+        result: tags,
+        success: true,
       };
     } else {
       return {
-        tags,
-        message: `Tags n posts do not exist for post with id  :${postId}.`,
-        operation: true,
-        statusCode: 0,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      error,
-      message: "Error finding tags n posts by postId.",
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_TAG_FIND_BY_POST_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // remove a single post linked to tag
-export async function removePostRelatedToTag(tagId: string, postId: string) {
+export async function removePostRelatedToTag(
+  tagId: string,
+  postId: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const TAG = await TagModel.findById(tagId);
     if (TAG) {
@@ -165,38 +243,70 @@ export async function removePostRelatedToTag(tagId: string, postId: string) {
       });
 
       return {
-        statusCode: 1,
-        operation: true,
-        updatedTag,
-        message: "Tag updated successfully",
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_UPDATE_REMOVE_POST_BY_TAG_ID_SUCCESS
+        ),
+        responseCode:
+          DATABASE_CODE_ENUM.DB_TAG_UPDATE_REMOVE_POST_BY_TAG_ID_SUCCESS,
+        result: updatedTag,
+        success: true,
+      };
+    } else {
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_UPDATE_BY_TAG_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_UPDATE_BY_TAG_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
     return {
-      error,
-      message: "Error while updating posts related to tag.",
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_TAG_UPDATE_REMOVE_POST_BY_TAG_ID_QUERY_ERROR
+      ),
+      responseCode:
+        DATABASE_CODE_ENUM.DB_TAG_UPDATE_REMOVE_POST_BY_TAG_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // deleting tag
-export async function deleteTagByTagId(tagId: string) {
+export async function deleteTagByTagId(
+  tagId: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const deletedTag = await TagModel.findByIdAndDelete(tagId);
-    return {
-      deletedTag,
-      operation: true,
-      message: "Tag deleted successfully",
-      statusCode: 1,
-    };
+    if (deletedTag !== null) {
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_DELETE_BY_TAG_ID_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_DELETE_BY_TAG_ID_SUCCESS,
+        result: deletedTag,
+        success: true,
+      };
+    } else {
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_TAG_DELETE_BY_TAG_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_TAG_DELETE_BY_TAG_ID_ERROR,
+        result: null,
+        success: false,
+      };
+    }
   } catch (error) {
     return {
-      error,
-      message: "Error deleting tag.",
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_TAG_DELETE_BY_TAG_ID_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_TAG_DELETE_BY_TAG_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }

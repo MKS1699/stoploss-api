@@ -1,8 +1,16 @@
+// todo : remove dead comments / previous responses
 import { POST } from "types/@types";
 import { PostModel } from "../Schema";
+import {
+  DATABASE_CODE_ENUM,
+  DATABASE_RESPONSE_RESULT,
+  DBResponseMessage,
+} from "tools/databaseResponseCodes";
 
 // create new post
-export async function createPost(post: POST) {
+export async function createPost(
+  post: POST
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const {
       postAuthors,
@@ -35,48 +43,86 @@ export async function createPost(post: POST) {
       createdBy,
       postExternalLinks,
     });
+    // return {
+    //   message: "Post created.",
+    //   operation: true,
+    //   newPost,
+    //   statusCode: 1,
+    // };
     return {
-      message: "Post created.",
-      operation: true,
-      newPost,
-      statusCode: 1,
+      message: DBResponseMessage(DATABASE_CODE_ENUM.DB_POST_CREATE_SUCCESS),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_CREATE_SUCCESS,
+      result: newPost,
+      success: true,
     };
   } catch (error) {
+    // return {
+    //   message: "Unable to create post.",
+    //   error,
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      message: "Unable to create post.",
-      error,
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(DATABASE_CODE_ENUM.DB_POST_CREATE_ERROR),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_CREATE_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // find post
 // by id
-export async function findPostById(id: string) {
+export async function findPostById(
+  id: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const post = await PostModel.findById(id);
-    if (post) {
+    if (post !== null) {
+      // return {
+      //   post,
+      //   message: "Post found.",
+      //   operation: true,
+      //   statusCode: 1,
+      // };
       return {
-        post,
-        message: "Post found.",
-        operation: true,
-        statusCode: 1,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_FIND_BY_POST_ID_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_POST_ID_SUCCESS,
+        result: post,
+        success: true,
       };
     } else {
+      // return {
+      //   post,
+      //   message: `Post with id : ${id} doesn't exist.`,
+      //   operation: true,
+      //   statusCode: 0,
+      // };
       return {
-        post,
-        message: `Post with id : ${id} doesn't exist.`,
-        operation: true,
-        statusCode: 0,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_FIND_BY_POST_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_POST_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
+    // return {
+    //   error,
+    //   message: "Unable to find post.",
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      error,
-      message: "Unable to find post.",
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_FIND_BY_POST_ID_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_POST_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
@@ -97,7 +143,7 @@ export async function findPostById(id: string) {
 export async function findPostByTypeWithLimit(
   postType: string,
   limit: number = -1
-) {
+): Promise<DATABASE_RESPONSE_RESULT<any[]>> {
   try {
     if (limit > 0) {
       const posts = await PostModel.find({ postType })
@@ -116,18 +162,34 @@ export async function findPostByTypeWithLimit(
         })
         .limit(limit);
       if (posts.length > 0) {
+        // return {
+        //   posts,
+        //   message: "Posts found.",
+        //   operation: true,
+        //   statusCode: 1,
+        // };
         return {
-          posts,
-          message: "Posts found.",
-          operation: true,
-          statusCode: 1,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_SUCCESS
+          ),
+          responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_SUCCESS,
+          result: posts,
+          success: true,
         };
       } else {
+        // return {
+        //   posts,
+        //   message: `Posts of type : ${postType} does not exist.`,
+        //   operation: true,
+        //   statusCode: 0,
+        // };
         return {
-          posts,
-          message: `Posts of type : ${postType} does not exist.`,
-          operation: true,
-          statusCode: 0,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_ERROR
+          ),
+          responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_ERROR,
+          result: null,
+          success: false,
         };
       }
     } else {
@@ -146,33 +208,57 @@ export async function findPostByTypeWithLimit(
           postUpdated: -1,
         });
       if (posts.length > 0) {
+        // return {
+        //   posts,
+        //   message: "Posts found.",
+        //   operation: true,
+        //   statusCode: 1,
+        // };
         return {
-          posts,
-          message: "Posts found.",
-          operation: true,
-          statusCode: 1,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_SUCCESS
+          ),
+          responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_SUCCESS,
+          result: posts,
+          success: true,
         };
       } else {
+        // return {
+        //   posts,
+        //   message: `Posts of type : ${postType} does not exist.`,
+        //   operation: true,
+        //   statusCode: 0,
+        // };
         return {
-          posts,
-          message: `Posts of type : ${postType} does not exist.`,
-          operation: true,
-          statusCode: 0,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_ERROR
+          ),
+          responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_ERROR,
+          result: null,
+          success: false,
         };
       }
     }
   } catch (error) {
+    // return {
+    //   error,
+    //   message: `Error finding "${postType}" posts.`,
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      error,
-      message: `Error finding "${postType}" posts.`,
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // in desc order of date that is newest first irrespective of category
-export async function latestPosts() {
+export async function latestPosts(): Promise<DATABASE_RESPONSE_RESULT<any[]>> {
   try {
     const posts = await PostModel.find()
       .select([
@@ -189,18 +275,51 @@ export async function latestPosts() {
         postUpdated: -1, // descending order date : new first old last
       })
       .limit(5);
-    return {
-      operation: true,
-      message: "Here are latest 5 posts.",
-      statusCode: 1,
-      posts,
-    };
+    if (posts.length > 0) {
+      // return {
+      //   operation: true,
+      //   message: "Here are latest 5 posts.",
+      //   statusCode: 1,
+      //   posts,
+      // };
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_FIND_LATEST_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_LATEST_SUCCESS,
+        result: posts,
+        success: true,
+      };
+    } else {
+      // return {
+      //   operation: true,
+      //   message: "Here are latest 5 posts.",
+      //   statusCode: 1,
+      //   posts,
+      // };
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_FIND_LATEST_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_LATEST_ERROR,
+        result: null,
+        success: false,
+      };
+    }
   } catch (error) {
+    // return {
+    //   error,
+    //   message: `Error finding latest posts.`,
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      error,
-      message: `Error finding latest posts.`,
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_FIND_LATEST_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_LATEST_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
@@ -210,7 +329,7 @@ export async function findPostsByUser(
   userId: string,
   afterLastPostDate: Date | 0 = 0,
   limit: number = 10
-) {
+): Promise<DATABASE_RESPONSE_RESULT<any[]>> {
   try {
     let posts: any[] = [];
     if (afterLastPostDate == 0) {
@@ -230,26 +349,50 @@ export async function findPostsByUser(
         .limit(limit);
     }
     if (posts.length > 0) {
+      // return {
+      //   posts,
+      //   message: `Posts created by ${userId}.`,
+      //   operation: true,
+      //   statusCode: 1,
+      // };
       return {
-        posts,
-        message: `Posts created by ${userId}.`,
-        operation: true,
-        statusCode: 1,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_FIND_BY_USER_ID_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_USER_ID_SUCCESS,
+        result: posts,
+        success: true,
       };
     } else {
+      // return {
+      //   posts,
+      //   message: "There are no posts by the user.",
+      //   operation: true,
+      //   statusCode: 0,
+      // };
       return {
-        posts,
-        message: "There are no posts by the user.",
-        operation: true,
-        statusCode: 0,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_FIND_BY_USER_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_USER_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
+    // return {
+    //   error,
+    //   message: "Unable to get Posts by User",
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      error,
-      message: "Unable to get Posts by User",
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_FIND_BY_USER_ID_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_USER_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
@@ -272,7 +415,7 @@ export async function findPostByTypeWithLimitByDateOfLastElem(
   postUpdatedOfLastElement: Date,
   postType: string,
   limit: number = -1
-) {
+): Promise<DATABASE_RESPONSE_RESULT<any[]>> {
   try {
     if (limit > 0) {
       const posts = await PostModel.find({ postType })
@@ -296,18 +439,34 @@ export async function findPostByTypeWithLimitByDateOfLastElem(
         })
         .limit(limit);
       if (posts.length > 0) {
+        // return {
+        //   posts,
+        //   message: "Posts found.",
+        //   operation: true,
+        //   statusCode: 1,
+        // };
         return {
-          posts,
-          message: "Posts found.",
-          operation: true,
-          statusCode: 1,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_SUCCESS
+          ),
+          responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_SUCCESS,
+          result: posts,
+          success: true,
         };
       } else {
+        // return {
+        //   posts,
+        //   message: `Posts of type : ${postType} does not exist.`,
+        //   operation: true,
+        //   statusCode: 0,
+        // };
         return {
-          posts,
-          message: `Posts of type : ${postType} does not exist.`,
-          operation: true,
-          statusCode: 0,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_ERROR
+          ),
+          responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_ERROR,
+          result: null,
+          success: false,
         };
       }
     } else {
@@ -331,135 +490,270 @@ export async function findPostByTypeWithLimitByDateOfLastElem(
           postUpdated: -1,
         });
       if (posts.length > 0) {
+        // return {
+        //   posts,
+        //   message: "Posts found.",
+        //   operation: true,
+        //   statusCode: 1,
+        // };
         return {
-          posts,
-          message: "Posts found.",
-          operation: true,
-          statusCode: 1,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_SUCCESS
+          ),
+          responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_SUCCESS,
+          result: posts,
+          success: true,
         };
       } else {
+        // return {
+        //   posts,
+        //   message: `Posts of type : ${postType} does not exist.`,
+        //   operation: true,
+        //   statusCode: 0,
+        // };
         return {
-          posts,
-          message: `Posts of type : ${postType} does not exist.`,
-          operation: true,
-          statusCode: 0,
+          message: DBResponseMessage(
+            DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_ERROR
+          ),
+          responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_ERROR,
+          result: null,
+          success: false,
         };
       }
     }
   } catch (error) {
+    // return {
+    //   message: `Error finding ${postType} posts.`,
+    //   error,
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      message: `Error finding ${postType} posts.`,
-      error,
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_BY_TYPE_LIMIT_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // count posts
 // by type
-export async function countPostsByType(postType: POST["postType"]) {
+export async function countPostsByType(
+  postType: POST["postType"]
+): Promise<DATABASE_RESPONSE_RESULT<number>> {
   try {
     const nPosts = await PostModel.countDocuments({ postType });
     if (nPosts > 0) {
+      // return {
+      //   message: `Posts of type : ${postType} are ${nPosts}.`,
+      //   nPosts,
+      //   operation: true,
+      //   statusCode: 1,
+      // };
       return {
-        message: `Posts of type : ${postType} are ${nPosts}.`,
-        nPosts,
-        operation: true,
-        statusCode: 1,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_COUNT_BY_TYPE_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_COUNT_BY_TYPE_SUCCESS,
+        result: nPosts,
+        success: true,
       };
     } else {
+      // return {
+      //   message: `Posts of type  : ${postType} do not exists.`,
+      //   nPosts,
+      //   operation: true,
+      //   statusCode: 0,
+      // };
       return {
-        message: `Posts of type  : ${postType} do not exists.`,
-        nPosts,
-        operation: true,
-        statusCode: 0,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_COUNT_BY_TYPE_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_COUNT_BY_TYPE_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
+    // return {
+    //   message: "Error counting posts by type.",
+    //   error,
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      message: "Error counting posts by type.",
-      error,
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_COUNT_BY_TYPE_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_COUNT_BY_TYPE_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // all posts
-export async function countAllPosts() {
+export async function countAllPosts(): Promise<
+  DATABASE_RESPONSE_RESULT<number>
+> {
   try {
     const nPosts = await PostModel.countDocuments();
     if (nPosts > 0) {
+      // return {
+      //   message: `Number of posts are ${nPosts}.`,
+      //   nPosts,
+      //   operation: true,
+      //   statusCode: 1,
+      // };
       return {
-        message: `Number of posts are ${nPosts}.`,
-        nPosts,
-        operation: true,
-        statusCode: 1,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_COUNT_ALL_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_COUNT_ALL_SUCCESS,
+        result: nPosts,
+        success: true,
       };
     } else {
+      // return {
+      //   message: `Posts do not exists.`,
+      //   nPosts,
+      //   operation: true,
+      //   statusCode: 0,
+      // };
       return {
-        message: `Posts do not exists.`,
-        nPosts,
-        operation: true,
-        statusCode: 0,
+        message: DBResponseMessage(DATABASE_CODE_ENUM.DB_POST_COUNT_ALL_ERROR),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_COUNT_ALL_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
+    // return {
+    //   message: "Error counting all posts.",
+    //   error,
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      message: "Error counting all posts.",
-      error,
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_COUNT_ALL_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_COUNT_ALL_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // by users
-export async function countPostsByUsers(userId: POST["createdBy"]["id"]) {
+export async function countPostsByUsers(
+  userId: POST["createdBy"]["id"]
+): Promise<DATABASE_RESPONSE_RESULT<number>> {
   try {
     const nPosts = await PostModel.countDocuments({ "createdBy.id": userId });
     if (nPosts > 0) {
+      // return {
+      //   message: `Posts created by user with id : "${userId}" are "${nPosts}".`,
+      //   nPosts,
+      //   operation: true,
+      //   statusCode: 1,
+      // };
       return {
-        message: `Posts created by user with id : "${userId}" are "${nPosts}".`,
-        nPosts,
-        operation: true,
-        statusCode: 1,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_COUNT_BY_USER_ID_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_COUNT_BY_USER_ID_SUCCESS,
+        result: nPosts,
+        success: true,
       };
     } else {
+      // return {
+      //   message: `There are no Posts created by user with id "${userId}" .`,
+      //   nPosts,
+      //   operation: true,
+      //   statusCode: 0,
+      // };
       return {
-        message: `There are no Posts created by user with id "${userId}" .`,
-        nPosts,
-        operation: true,
-        statusCode: 0,
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_COUNT_BY_USER_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_COUNT_BY_USER_ID_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
+    // return {
+    //   message: "Error counting posts by user.",
+    //   error,
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      message: "Error counting posts by user.",
-      error,
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_COUNT_BY_USER_ID_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_COUNT_BY_USER_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
 
 // delete post by id
-export async function deletePostById(postId: string) {
+export async function deletePostById(
+  postId: string
+): Promise<DATABASE_RESPONSE_RESULT<any>> {
   try {
     const deletedPost = await PostModel.findByIdAndDelete(postId);
-    return {
-      deletedPost,
-      operation: true,
-      statusCode: 1,
-      message: `Post with id : ${postId} deleted.`,
-    };
+    if (deletedPost !== null) {
+      // return {
+      //   deletedPost,
+      //   operation: true,
+      //   statusCode: 1,
+      //   message: `Post with id : ${postId} deleted.`,
+      // };
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_DELETE_BY_ID_SUCCESS
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_DELETE_BY_ID_SUCCESS,
+        result: deletedPost,
+        success: true,
+      };
+    } else {
+      // return {
+      //   deletedPost,
+      //   operation: true,
+      //   statusCode: 1,
+      //   message: `Post with id : ${postId} deleted.`,
+      // };
+      return {
+        message: DBResponseMessage(
+          DATABASE_CODE_ENUM.DB_POST_DELETE_BY_ID_ERROR
+        ),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_DELETE_BY_ID_ERROR,
+        result: null,
+        success: false,
+      };
+    }
   } catch (error) {
+    // return {
+    //   error,
+    //   message: "Error while deleting post",
+    //   operation: false,
+    //   statusCode: 0,
+    // };
     return {
-      error,
-      message: "Error while deleting post",
-      operation: false,
-      statusCode: 0,
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_DELETE_BY_ID_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_DELETE_BY_ID_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
@@ -467,7 +761,9 @@ export async function deletePostById(postId: string) {
 // get all the posts (title, image, description , authors & Id )
 // in postUpdate descending format latest first
 // for search purpose (searching will be done in the browser)
-export async function getAllPostsForSearch() {
+export async function getAllPostsForSearch(): Promise<
+  DATABASE_RESPONSE_RESULT<any[]>
+> {
   try {
     const posts = await PostModel.find()
       .select([
@@ -481,23 +777,43 @@ export async function getAllPostsForSearch() {
       .sort({ postUpdated: -1 });
 
     if (posts.length > 0) {
+      // return {
+      //   posts,
+      //   message: "Posts found.",
+      //   operation: "success",
+      // };
       return {
-        posts,
-        message: "Posts found.",
-        operation: "success",
+        message: DBResponseMessage(DATABASE_CODE_ENUM.DB_POST_FIND_ALL_SUCCESS),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_ALL_SUCCESS,
+        result: posts,
+        success: true,
       };
     } else {
+      // return {
+      //   posts,
+      //   message: "No Posts are there in the db.",
+      //   operation: "fail",
+      // };
       return {
-        posts,
-        message: "No Posts are there in the db.",
-        operation: "fail",
+        message: DBResponseMessage(DATABASE_CODE_ENUM.DB_POST_FIND_ALL_ERROR),
+        responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_ALL_ERROR,
+        result: null,
+        success: false,
       };
     }
   } catch (error) {
+    // return {
+    //   error,
+    //   message: "Error finding posts.",
+    //   operation: "error",
+    // };
     return {
-      error,
-      message: "Error finding posts.",
-      operation: "error",
+      message: DBResponseMessage(
+        DATABASE_CODE_ENUM.DB_POST_FIND_ALL_QUERY_ERROR
+      ),
+      responseCode: DATABASE_CODE_ENUM.DB_POST_FIND_ALL_QUERY_ERROR,
+      result: error,
+      success: false,
     };
   }
 }
