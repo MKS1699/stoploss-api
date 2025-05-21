@@ -1,33 +1,27 @@
 // todo : remove dead comments aks previous old responses
 
+import { createDBResponseFromCode } from "tools/dbResponse";
 import {
   DATABASE_CODE_ENUM,
-  DATABASE_RESPONSE_RESULT,
+  DATABASE_RESPONSE,
   DBResponseMessage,
-} from "tools/databaseResponseCodes";
+} from "../../tools/databaseResponseCodes";
 import { UserModel } from "../Schema";
+import { IUserDocument } from "db/Schema/userSchema";
 
 // function for getting total number of users in the user collection
-export async function totalUsers(): Promise<DATABASE_RESPONSE_RESULT<number>> {
+export async function totalUsers(): Promise<DATABASE_RESPONSE<number>> {
   try {
-    const users = await UserModel.countDocuments();
-    return {
-      message: DBResponseMessage(
-        DATABASE_CODE_ENUM.DB_USERS_TOTAL_COUNT_SUCCESS
-      ),
-      responseCode: DATABASE_CODE_ENUM.DB_USERS_TOTAL_COUNT_SUCCESS,
-      result: users,
-      success: true,
-      // count: users,
-    };
+    const numberOfUsers: number = await UserModel.countDocuments();
+    return createDBResponseFromCode({
+      code: DATABASE_CODE_ENUM.DB_USERS_TOTAL_COUNT_SUCCESS,
+      result: numberOfUsers,
+    });
   } catch (error) {
-    return {
-      responseCode: DATABASE_CODE_ENUM.DB_USERS_TOTAL_COUNT_ERROR,
-      message: DBResponseMessage(DATABASE_CODE_ENUM.DB_USERS_TOTAL_COUNT_ERROR),
+    return createDBResponseFromCode({
+      code: DATABASE_CODE_ENUM.DB_USERS_TOTAL_COUNT_ERROR,
       result: error,
-      success: false,
-      // error,
-    };
+    });
   }
 }
 
@@ -38,119 +32,75 @@ export async function addUser({
 }: {
   userPassword: string;
   userName: string;
-}): Promise<DATABASE_RESPONSE_RESULT<any>> {
+}): Promise<DATABASE_RESPONSE<IUserDocument>> {
   try {
-    const user = await UserModel.create({
+    const user: IUserDocument = await UserModel.create({
       userPassword,
       userName,
     });
-    return {
-      message: DBResponseMessage(DATABASE_CODE_ENUM.DB_USER_CREATE_SUCCESS),
-      responseCode: DATABASE_CODE_ENUM.DB_USER_CREATE_SUCCESS,
+    return createDBResponseFromCode({
+      code: DATABASE_CODE_ENUM.DB_USER_CREATE_SUCCESS,
       result: user,
-      success: true,
-    };
-    // return { message: "success", user };
+    });
   } catch (error) {
-    return {
-      responseCode: DATABASE_CODE_ENUM.DB_USER_CREATE_ERROR,
-      message: DBResponseMessage(DATABASE_CODE_ENUM.DB_USER_CREATE_ERROR),
+    return createDBResponseFromCode({
+      code: DATABASE_CODE_ENUM.DB_USER_CREATE_ERROR,
       result: error,
-      success: false,
-      // error,
-    };
+    });
   }
 }
 
 // function for finding user by user name
 export async function findUserByUserName(
   userName: string
-): Promise<DATABASE_RESPONSE_RESULT<any>> {
+): Promise<DATABASE_RESPONSE<IUserDocument>> {
   try {
-    const foundedUser = await UserModel.findOne({ userName }).select(
-      "userName _id"
-    );
+    const foundedUser: IUserDocument = await UserModel.findOne({
+      userName,
+    }).select("userName _id");
     if (foundedUser !== null) {
-      return {
-        responseCode: DATABASE_CODE_ENUM.DB_USER_FIND_BY_NAME_SUCCESS,
-        message: DBResponseMessage(
-          DATABASE_CODE_ENUM.DB_USER_FIND_BY_NAME_SUCCESS
-        ),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_FIND_BY_NAME_SUCCESS,
         result: foundedUser,
-        success: true,
-      };
-      // return { message: "success", foundedUser };
+      });
     } else {
-      // return { message: "success", foundedUser };
-      return {
-        responseCode: DATABASE_CODE_ENUM.DB_USER_FIND_BY_NAME_ERROR,
-        message: DBResponseMessage(
-          DATABASE_CODE_ENUM.DB_USER_FIND_BY_NAME_ERROR
-        ),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_FIND_BY_NAME_ERROR,
         result: null,
-        success: false,
-      };
+      });
     }
   } catch (error) {
-    // return { message: "error", error };
-    return {
-      responseCode: DATABASE_CODE_ENUM.DB_USER_FIND_BY_NAME_QUERY_ERROR,
-      message: DBResponseMessage(
-        DATABASE_CODE_ENUM.DB_USER_FIND_BY_NAME_QUERY_ERROR
-      ),
+    return createDBResponseFromCode({
+      code: DATABASE_CODE_ENUM.DB_USER_FIND_BY_NAME_QUERY_ERROR,
       result: error,
-      success: false,
-    };
+    });
   }
 }
 
 // function for getting userPassword only
 export async function getUserPassword(
   userId: string
-): Promise<DATABASE_RESPONSE_RESULT<any>> {
+): Promise<DATABASE_RESPONSE<IUserDocument>> {
   try {
-    const user = await UserModel.findById(userId).select("userPassword");
+    const user: IUserDocument = await UserModel.findById(userId).select(
+      "userPassword"
+    );
     if (user !== null) {
-      // return {
-      //   operation: "success",
-      //   message: "User found.",
-      //   user,
-      // };
-      return {
-        responseCode:
-          DATABASE_CODE_ENUM.DB_USER_FIND_PASSWORD_BY_USER_ID_SUCCESS,
-        message: DBResponseMessage(
-          DATABASE_CODE_ENUM.DB_USER_FIND_PASSWORD_BY_USER_ID_SUCCESS
-        ),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_FIND_PASSWORD_BY_USER_ID_SUCCESS,
         result: user,
-        success: true,
-      };
+      });
     } else {
-      // return {
-      //   operation: "success",
-      //   message: "User found.",
-      //   user,
-      // };
-      return {
-        responseCode: DATABASE_CODE_ENUM.DB_USER_FIND_PASSWORD_BY_USER_ID_ERROR,
-        message: DBResponseMessage(
-          DATABASE_CODE_ENUM.DB_USER_FIND_PASSWORD_BY_USER_ID_ERROR
-        ),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_FIND_PASSWORD_BY_USER_ID_ERROR,
         result: null,
-        success: false,
-      };
+      });
     }
   } catch (error) {
-    // return { operation: "error", message: "Unable to find the user", error };
-    return {
-      responseCode:
-        DATABASE_CODE_ENUM.DB_USER_FIND_PASSWORD_BY_USER_ID_QUERY_ERROR,
-      message: DBResponseMessage(
-        DATABASE_CODE_ENUM.DB_USER_FIND_PASSWORD_BY_USER_ID_QUERY_ERROR
-      ),
+    return createDBResponseFromCode({
+      code: DATABASE_CODE_ENUM.DB_USER_FIND_PASSWORD_BY_USER_ID_QUERY_ERROR,
       result: error,
-      success: false,
-    };
+    });
   }
 }
 
@@ -158,9 +108,9 @@ export async function getUserPassword(
 export async function updateUserName(
   id: string,
   newUserName: string
-): Promise<DATABASE_RESPONSE_RESULT<any>> {
+): Promise<DATABASE_RESPONSE<IUserDocument>> {
   try {
-    const updatedUser = await UserModel.findByIdAndUpdate(
+    const updatedUser: IUserDocument = await UserModel.findByIdAndUpdate(
       id,
       {
         userName: newUserName,
@@ -168,36 +118,21 @@ export async function updateUserName(
       { new: true, returnDocument: "after" }
     );
     if (updatedUser !== null) {
-      // return { message: "success", updatedUser };
-      return {
-        responseCode: DATABASE_CODE_ENUM.DB_USER_UPDATE_NAME_SUCCESS,
-        message: DBResponseMessage(
-          DATABASE_CODE_ENUM.DB_USER_UPDATE_NAME_SUCCESS
-        ),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_UPDATE_NAME_SUCCESS,
         result: updatedUser,
-        success: true,
-      };
+      });
     } else {
-      // return { message: "success", updatedUser };
-      return {
-        responseCode: DATABASE_CODE_ENUM.DB_USER_UPDATE_NAME_ERROR,
-        message: DBResponseMessage(
-          DATABASE_CODE_ENUM.DB_USER_UPDATE_NAME_ERROR
-        ),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_UPDATE_NAME_ERROR,
         result: null,
-        success: false,
-      };
+      });
     }
   } catch (error) {
-    // return { message: "error", error };
-    return {
-      responseCode: DATABASE_CODE_ENUM.DB_USER_UPDATE_NAME_QUERY_ERROR,
-      message: DBResponseMessage(
-        DATABASE_CODE_ENUM.DB_USER_UPDATE_NAME_QUERY_ERROR
-      ),
+    return createDBResponseFromCode({
+      code: DATABASE_CODE_ENUM.DB_USER_UPDATE_NAME_QUERY_ERROR,
       result: error,
-      success: false,
-    };
+    });
   }
 }
 
@@ -205,75 +140,51 @@ export async function updateUserName(
 export async function updateUserPassword(
   id: string,
   newUserPassword: string
-): Promise<DATABASE_RESPONSE_RESULT<any>> {
+): Promise<DATABASE_RESPONSE<IUserDocument>> {
   try {
-    const updatedUser = await UserModel.findByIdAndUpdate(id, {
+    const updatedUser: IUserDocument = await UserModel.findByIdAndUpdate(id, {
       userPassword: newUserPassword,
     });
     if (updatedUser !== null) {
-      // return { message: "success", updatedUser };
-      return {
-        responseCode: DATABASE_CODE_ENUM.DB_USER_UPDATE_PASSWORD_SUCCESS,
-        message: DBResponseMessage(
-          DATABASE_CODE_ENUM.DB_USER_UPDATE_PASSWORD_SUCCESS
-        ),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_UPDATE_PASSWORD_SUCCESS,
         result: updatedUser,
-        success: true,
-      };
+      });
     } else {
-      // return { message: "success", updatedUser };
-      return {
-        responseCode: DATABASE_CODE_ENUM.DB_USER_UPDATE_PASSWORD_ERROR,
-        message: DBResponseMessage(
-          DATABASE_CODE_ENUM.DB_USER_UPDATE_PASSWORD_ERROR
-        ),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_UPDATE_PASSWORD_ERROR,
         result: null,
-        success: false,
-      };
+      });
     }
   } catch (error) {
-    // return { message: "error", error };
-    return {
-      responseCode: DATABASE_CODE_ENUM.DB_USER_UPDATE_PASSWORD_QUERY_ERROR,
-      message: DBResponseMessage(
-        DATABASE_CODE_ENUM.DB_USER_UPDATE_PASSWORD_QUERY_ERROR
-      ),
+    return createDBResponseFromCode({
+      code: DATABASE_CODE_ENUM.DB_USER_UPDATE_PASSWORD_QUERY_ERROR,
       result: error,
-      success: false,
-    };
+    });
   }
 }
 
 // function for deleting the user
 export async function deleteUser(
   id: string
-): Promise<DATABASE_RESPONSE_RESULT<any>> {
+): Promise<DATABASE_RESPONSE<IUserDocument>> {
   try {
-    const deletedUser = await UserModel.findByIdAndDelete(id);
+    const deletedUser: IUserDocument = await UserModel.findByIdAndDelete(id);
     if (deletedUser !== null) {
-      // return { message: "success", deletedUser };
-      return {
-        responseCode: DATABASE_CODE_ENUM.DB_USER_DELETE_SUCCESS,
-        message: DBResponseMessage(DATABASE_CODE_ENUM.DB_USER_DELETE_SUCCESS),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_DELETE_SUCCESS,
         result: deletedUser,
-        success: true,
-      };
+      });
     } else {
-      // return { message: "success", deletedUser };
-      return {
-        responseCode: DATABASE_CODE_ENUM.DB_USER_DELETE_ERROR,
-        message: DBResponseMessage(DATABASE_CODE_ENUM.DB_USER_DELETE_ERROR),
+      return createDBResponseFromCode({
+        code: DATABASE_CODE_ENUM.DB_USER_DELETE_ERROR,
         result: null,
-        success: false,
-      };
+      });
     }
   } catch (error) {
-    // return { message: "error", error };
-    return {
-      responseCode: DATABASE_CODE_ENUM.DB_USER_DELETE_QUERY_ERROR,
-      message: DBResponseMessage(DATABASE_CODE_ENUM.DB_USER_DELETE_QUERY_ERROR),
+    return createDBResponseFromCode({
+      code: DATABASE_CODE_ENUM.DB_USER_DELETE_QUERY_ERROR,
       result: error,
-      success: false,
-    };
+    });
   }
 }
