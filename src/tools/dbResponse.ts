@@ -6,6 +6,7 @@ import {
 
 type responseType = "success" | "error" | "queryGenericError";
 
+// success response function
 function createDBSuccessResponse<T>({
   code,
   result,
@@ -21,6 +22,7 @@ function createDBSuccessResponse<T>({
   };
 }
 
+// error response function
 function createDBErrorResponse<T>({
   code,
   result,
@@ -36,6 +38,7 @@ function createDBErrorResponse<T>({
   };
 }
 
+// db query generic error function
 function createDBQueryGenericErrorResponse<T>({
   code,
   result,
@@ -51,6 +54,7 @@ function createDBQueryGenericErrorResponse<T>({
   };
 }
 
+// response Type creation based on db response code function
 function generateResponseTypeNFor(code: DATABASE_CODE_ENUM): responseType {
   let responseType: responseType | null = null;
 
@@ -65,6 +69,7 @@ function generateResponseTypeNFor(code: DATABASE_CODE_ENUM): responseType {
   return responseType;
 }
 
+// creating db response based on db code function
 export function createDBResponseFromCode<T>({
   code,
   result,
