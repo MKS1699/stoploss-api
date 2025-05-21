@@ -1,18 +1,25 @@
-import mongoose from "mongoose";
+import mongoose, { Document, Model } from "mongoose";
 
-const tagSchema: mongoose.Schema = new mongoose.Schema({
-  tag: {
-    type: String,
-    required: true,
-  },
-  posts: [
-    {
+export interface ITagDocument extends Document {
+  tag: string;
+  posts: string[];
+}
+
+const tagSchema: mongoose.Schema<ITagDocument> =
+  new mongoose.Schema<ITagDocument>({
+    tag: {
       type: String,
       required: true,
     },
-  ],
-});
+    posts: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+  });
 
-const TagModel = mongoose.models.Tag || mongoose.model("Tag", tagSchema);
+const TagModel: Model<ITagDocument> =
+  mongoose.models.Tag || mongoose.model<ITagDocument>("Tag", tagSchema);
 
 export default TagModel;
