@@ -14,11 +14,11 @@ export interface POST {
   postImage: IMAGE;
   hasImage: boolean;
   postParagraphs: PARAGRAPH[];
-  postTags: string[];
+  // postTags: string[];
   postDescription: string;
-  postInfo: {
-    upcomingIPO: boolean;
-  };
+  // postInfo: {
+  //   upcomingIPO: boolean;
+  // };
   createdBy: {
     name: string;
     id: string;
@@ -48,15 +48,16 @@ export interface IMAGE {
 }
 
 // Table Types for the post
+
 export type TABLE = string[][];
 
-// Upcoming IPO List Types
-export interface UPCOMINGIPOLISTTYPES {
-  ipoName: string;
-  open: string;
-  close: string;
-  linkedPostsId: string[];
-}
+// // Upcoming IPO List Types
+// export interface UPCOMINGIPOLISTTYPES {
+//   ipoName: string;
+//   open: string;
+//   close: string;
+//   linkedPostsId: string[];
+// }
 
 // IPO types
 export interface IPOTYPES {
@@ -88,3 +89,79 @@ export interface IPOTYPES {
     userId: string;
   };
 }
+
+// EMPTY OBJECTS
+
+// empty post
+export const emptyPost: POST = {
+  createdBy: {
+    name: "",
+    id: "",
+  },
+  hasImage: false,
+  postAuthors: [],
+  postCreated: "",
+  postDescription: "",
+  postExternalLinks: [],
+  postImage: {
+    caption: "",
+    links: {
+      medium: "",
+      original: "",
+      thumbnail: "",
+    },
+  },
+  postParagraphs: [
+    {
+      hasImages: false,
+      hasTable: false,
+      paraBody: "",
+      paraHeading: "",
+      paraImages: [
+        {
+          caption: "",
+          links: {
+            medium: "",
+            original: "",
+            thumbnail: "",
+          },
+        },
+      ],
+      paraSubHeading: "",
+      paraTable: [],
+    },
+  ],
+  // postTags: [],
+  postTitle: "",
+  postType: "blog",
+  postUpdated: "",
+};
+
+// empty ipo
+export const emptyIPO: IPOTYPES = {
+  allotmentLink: "",
+  allotmentStatus: false,
+  category: "mainboard",
+  createdBy: {
+    userId: "",
+    userName: "",
+  },
+  dates: {
+    close: "",
+    listing: "",
+    open: "",
+  },
+  exPremium: "",
+  ipoPhase: "current",
+  linkedPostsId: [],
+  logo: {
+    medium: "",
+    original: "",
+    thumbnail: "",
+  },
+  lotSize: "",
+  name: "",
+  offerPrice: "",
+  status: "apply",
+  subscription: "",
+};

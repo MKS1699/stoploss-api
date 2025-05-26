@@ -90,11 +90,11 @@ const postSchema: mongoose.Schema<IPostDocument> =
       type: String,
       required: true,
     },
-    postInfo: {
-      upComingIPO: {
-        type: Boolean,
-      },
-    },
+    // postInfo: {
+    //   upComingIPO: {
+    //     type: Boolean,
+    //   },
+    // },
     createdBy: {
       id: {
         type: String,

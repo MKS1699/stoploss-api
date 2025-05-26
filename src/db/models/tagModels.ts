@@ -2,10 +2,10 @@ import {
   DATABASE_CODE_ENUM,
   DATABASE_RESPONSE,
   DBResponseMessage,
-} from "tools/databaseResponseCodes";
+} from "../../tools/databaseResponseCodes";
 import { TagModel } from "../Schema";
-import { ITagDocument } from "db/Schema/tagSchema";
-import { createDBResponseFromCode } from "tools/dbResponse";
+import { ITagDocument } from "../Schema/tagSchema";
+import { createDBResponseFromCode } from "../../tools/dbResponse";
 
 // creating a new tag
 export async function createTag({

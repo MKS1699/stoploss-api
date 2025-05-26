@@ -1,11 +1,11 @@
-export type DATABASE_RESPONSE_RESULT<T> = {
+export type DATABASE_RESPONSE<T> = {
   success: boolean;
   message: string;
   result: T | null;
   responseCode: DATABASE_CODE_ENUM;
 };
 
-export type DATABASE_RESPONSES = Record<DATABASE_CODE_ENUM, string>;
+export type DATABASE_RESPONSES_DETAILS = Record<DATABASE_CODE_ENUM, string>;
 
 export enum DATABASE_CODE_ENUM {
   // 6xxx Database Query success
@@ -137,7 +137,7 @@ export enum DATABASE_CODE_ENUM {
   DB_TAG_DELETE_BY_TAG_ID_QUERY_ERROR = 9305,
 }
 
-export const DATABASE_RESPONSES_DETAILS: DATABASE_RESPONSES = {
+export const DATABASE_RESPONSES_DETAILS: DATABASE_RESPONSES_DETAILS = {
   // users related codes
 
   // success

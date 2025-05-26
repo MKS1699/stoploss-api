@@ -34,3 +34,45 @@ export async function checkForDuplicate(
   }
   return result;
 }
+
+// get all keys of the object
+export function listAllKeys<T>(obj: T, prefix = ""): string[] {
+  let keys: string[] = [];
+
+  for (let key in obj) {
+    let value = obj[key];
+    let fullKey = prefix ? `${prefix}.${key}` : key;
+
+    // if (Array.isArray(value)) {
+    //   if (
+    //     value.length > 0 &&
+    //     typeof value[0] === "object" &&
+    //     value[0] !== null
+    //   ) {
+    //     const arrayKeys = listAllKeys(value[0], `${fullKey}[0]`);
+    //     keys.push(...arrayKeys);
+    //   } else {
+    //     keys.push(fullKey);
+    //   }
+    // } else
+    if (typeof value === "object" && value !== null) {
+      keys = [...keys, ...listAllKeys(value, fullKey)];
+    } else {
+      keys.push(fullKey);
+    }
+  }
+  return keys;
+}
+
+// getting value of path
+// checking a path is defined or not
+// the path is provided by listAllKeys
+// function on an object {a : {b : c}}
+// => [a, a.b]
+// so this fn now list the value of paths
+// which are "a" and "a.b" also taking a
+// object (obj) value to start looking into
+
+export function getValueByPath(obj: any, path: string): any {
+  return path.split(".").reduce((acc, key) => acc?.[key], obj);
+}

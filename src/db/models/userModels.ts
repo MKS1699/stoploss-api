@@ -1,13 +1,13 @@
 // todo : remove dead comments aks previous old responses
 
-import { createDBResponseFromCode } from "tools/dbResponse";
+import { createDBResponseFromCode } from "../../tools/dbResponse";
 import {
   DATABASE_CODE_ENUM,
   DATABASE_RESPONSE,
   DBResponseMessage,
 } from "../../tools/databaseResponseCodes";
 import { UserModel } from "../Schema";
-import { IUserDocument } from "db/Schema/userSchema";
+import { IUserDocument } from "../Schema/userSchema";
 
 // function for getting total number of users in the user collection
 export async function totalUsers(): Promise<DATABASE_RESPONSE<number>> {

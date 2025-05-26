@@ -6,9 +6,9 @@ import {
   DATABASE_RESPONSE,
   DATABASE_RESPONSES_DETAILS,
   DBResponseMessage,
-} from "tools/databaseResponseCodes";
-import { IIPODocument } from "db/Schema/ipoSchema";
-import { createDBResponseFromCode } from "tools/dbResponse";
+} from "../../tools/databaseResponseCodes";
+import { IIPODocument } from "../Schema/ipoSchema";
+import { createDBResponseFromCode } from "../../tools/dbResponse";
 
 // create new ipo
 export async function createNewIPO({

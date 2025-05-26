@@ -5,10 +5,10 @@ import {
   DATABASE_CODE_ENUM,
   DATABASE_RESPONSE,
   DBResponseMessage,
-} from "tools/databaseResponseCodes";
-import { IIPODocument } from "db/Schema/ipoSchema";
-import { IPostDocument } from "db/Schema/postSchema";
-import { createDBResponseFromCode } from "tools/dbResponse";
+} from "../../tools/databaseResponseCodes";
+import { IIPODocument } from "../Schema/ipoSchema";
+import { IPostDocument } from "../Schema/postSchema";
+import { createDBResponseFromCode } from "../../tools/dbResponse";
 
 // create new post
 export async function createPost(
@@ -20,7 +20,7 @@ export async function createPost(
       postDescription,
       hasImage,
       postImage,
-      postInfo,
+      // postInfo,
       postParagraphs,
       // postTags,
       postTitle,
@@ -36,7 +36,7 @@ export async function createPost(
       postDescription,
       hasImage,
       postImage,
-      postInfo,
+      // postInfo,
       postParagraphs,
       // postTags,
       postTitle,
